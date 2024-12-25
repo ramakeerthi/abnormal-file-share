@@ -8,17 +8,14 @@ const NavigationBar = ({ isLoggedIn, onLogout }) => {
   const userRole = localStorage.getItem('user_role');
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
+    <Navbar bg="black" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">File Share Application</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/"><img src="/FileShare_logo.png" alt="FileShare Logo" height="60em" /></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav>
             {!isLoggedIn ? (
               <>
-                {location.pathname !== '/register' && (
-                  <Nav.Link as={Link} to="/register">Register</Nav.Link>
-                )}
                 {location.pathname !== '/login' && (
                   <Nav.Link as={Link} to="/login">Login</Nav.Link>
                 )}

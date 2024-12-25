@@ -38,41 +38,50 @@ const MFASetup = () => {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: '500px' }}>
-      <h2 className="mb-4">Set Up Two-Factor Authentication</h2>
+    <Container className="mt-5" style={{ maxWidth: '100%' }}>
+      <div className="text-center mb-5">
+        <h2 className="display-6 fw-bold">Enhance Your Security</h2>
+        <p className="text-muted">Set up two-factor authentication to protect your account</p>
+      </div>
       
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
+      {error && <Alert variant="danger" className="fade show">{error}</Alert>}
+      {success && <Alert variant="success" className="fade show">{success}</Alert>}
 
-      <div className="mb-4">
-        <h4>Instructions:</h4>
-        <ol>
-          <li>Download Google Authenticator or any TOTP-based authenticator app</li>
-          <li>Scan the QR code below with your authenticator app</li>
-          <li>Enter the 6-digit code from your authenticator app to verify setup</li>
-        </ol>
+      <div className="d-flex gap-4 mb-4">
+        <div className="card shadow-sm p-4" style={{flex: 1}}>
+          <h5 className="card-title text-primary mb-3">Setup Instructions</h5>
+          <ol className="list-group list-group-flush list-group-numbered text-start">
+            <li className="list-group-item border-0">Download Google Authenticator or any TOTP-based authenticator app.</li>
+            <li className="list-group-item border-0">Scan the QR code below with your authenticator app.</li>
+            {secret && (
+                <li className="list-group-item border-0">
+                If you can't scan the QR code, enter this secret key manually: <br/>
+                <code className="user-select-all fs-5 text-primary">{secret}</code>
+                </li>
+            )}
+            <li className="list-group-item border-0">Enter the 6-digit code from your authenticator app to verify setup.</li>
+          </ol>
+        </div>
+
+        {qrCode && (
+          <div className="text-center" style={{flex: 1}}>
+            <div className="d-inline-block p-3 bg-light rounded-3">
+              <Image 
+                src={`data:image/png;base64,${qrCode}`} 
+                alt="QR Code"
+                style={{ maxWidth: '300px' }}
+                className="img-fluid"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      {qrCode && (
-        <div className="text-center mb-4">
-          <Image 
-            src={`data:image/png;base64,${qrCode}`} 
-            alt="QR Code"
-            style={{ maxWidth: '200px' }}
-          />
-        </div>
-      )}
-
-      {secret && (
-        <div className="mb-4">
-          <p>If you can't scan the QR code, enter this secret key manually:</p>
-          <code className="d-block p-2 bg-light">{secret}</code>
-        </div>
-      )}
+      <br />
 
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Verification Code</Form.Label>
+        <Form.Group className="mb-3" style={{ maxWidth: '300px', margin: '0 auto' }}>
+          <Form.Label className="fw-bold fs-4">Verification Code</Form.Label>
           <Form.Control
             type="text"
             value={code}

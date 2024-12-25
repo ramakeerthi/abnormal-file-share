@@ -51,9 +51,15 @@ const Register = () => {
       setSuccess('Registration successful! Please login to continue.');
       setFormData({ email: '', password: '', confirmPassword: '' });
     } catch (error) {
-      setErrors({
-        submit: error.response?.data?.message || 'Registration failed. Please try again.',
-      });
+      if (error.response?.data?.email?.[0] === "user with this email already exists.") {
+        setErrors({
+          submit: 'An account with this email already exists. Please login instead.',
+        });
+      } else {
+        setErrors({
+          submit: error.response?.data?.message || 'Registration failed. Please try again.',
+        });
+      }
     }
   };
 
