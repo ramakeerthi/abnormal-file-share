@@ -6,6 +6,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
+        extra_fields.setdefault('username', email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -31,6 +32,7 @@ class User(AbstractUser):
         ('USER', 'Regular User'),
         ('GUEST', 'Guest')
     ])
+    totp_secret = models.CharField(max_length=32, null=True, blank=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
