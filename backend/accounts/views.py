@@ -1,9 +1,11 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.contrib.auth import authenticate, login, logout
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from rest_framework_simplejwt.exceptions import TokenError
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -30,8 +32,11 @@ class LoginView(APIView):
                 password=serializer.validated_data['password']
             )
             if user:
-                login(request, user)
-                return Response({"message": "Login successful"})
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                })
             return Response(
                 {"error": "Invalid credentials"},
                 status=status.HTTP_401_UNAUTHORIZED
@@ -39,6 +44,29 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        logout(request)
-        return Response({"message": "Logged out successfully"})
+        try:
+            refresh_token = request.data.get("refresh")
+            
+            if not refresh_token:
+                return Response(
+                    {"error": "Refresh token is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+                return Response({"message": "Logged out successfully"})
+            except TokenError as e:
+                return Response(
+                    {"error": f"Token Error: {str(e)}"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Unexpected error: {str(e)}"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )

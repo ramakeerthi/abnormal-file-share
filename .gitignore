@@ -4,6 +4,10 @@ __pycache__/
 venv/
 *.env
 
+# Database
+*.sqlite3
+db.sqlite3
+
 # React
 node_modules/
 build/
@@ -18,7 +22,6 @@ yarn-error.log*
 # IDE
 .vscode/
 .idea/
-
 
 # SSL Certificates
 certificates/
