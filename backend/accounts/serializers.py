@@ -1,23 +1,18 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-
-User = get_user_model()
+from .models import User
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    
     class Meta:
         model = User
         fields = ('email', 'password', 'role')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-    
+        extra_kwargs = {'password': {'write_only': True}}
+        read_only_fields = ('role',)  # Make role read-only
+
     def create(self, validated_data):
-        # Use email as username
-        validated_data['username'] = validated_data['email']
-        user = User.objects.create_user(**validated_data)
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
         return user
 
 class UserLoginSerializer(serializers.Serializer):

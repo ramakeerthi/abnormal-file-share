@@ -39,7 +39,7 @@ class TOTPSetupView(APIView):
             totp = pyotp.TOTP(secret)
             provisioning_uri = totp.provisioning_uri(
                 request.user.email,
-                issuer_name="YourAppName"
+                issuer_name="secure-file-share"
             )
 
             # Create QR code image
@@ -108,6 +108,7 @@ class LoginView(APIView):
             if not user.totp_secret:
                 response_data = {
                     'mfa_setup_required': True,
+                    'user_role': user.role,
                     **temp_tokens
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
@@ -116,6 +117,7 @@ class LoginView(APIView):
             if 'totp_code' not in request.data:
                 return Response({
                     'mfa_required': True,
+                    'user_role': user.role,
                     **temp_tokens
                 }, status=status.HTTP_200_OK)
 
@@ -137,6 +139,7 @@ class LoginView(APIView):
             return Response({
                 'refresh': str(final_refresh),
                 'access': str(final_refresh.access_token),
+                'user_role': user.role,
             })
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
