@@ -12,8 +12,6 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [mfaRequired, setMfaRequired] = useState(false);
-  const [mfaSetupRequired, setMfaSetupRequired] = useState(false);
-  const [tempTokens, setTempTokens] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -58,13 +56,8 @@ const Login = () => {
 
         if (response.mfa_required) {
           setMfaRequired(true);
-          setTempTokens({
-            temp_access_token: response.temp_access_token,
-            temp_refresh_token: response.temp_refresh_token,
-          });
           localStorage.setItem('user_role', response.user_role);
         } else if (response.mfa_setup_required) {
-          setMfaSetupRequired(true);
           localStorage.setItem('access_token', response.temp_access_token);
           localStorage.setItem('refresh_token', response.temp_refresh_token);
           localStorage.setItem('username', formData.email);
@@ -149,4 +142,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;
