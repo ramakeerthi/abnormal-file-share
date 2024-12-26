@@ -4,19 +4,11 @@ const API_URL = 'https://localhost:8000/accounts';
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true,
 });
 
-// Add token to requests if it exists
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// The CSRF token will be automatically handled by Django's CSRF middleware
+// No need to manually set it in headers
 
 export const register = async (userData) => {
   const response = await api.post('/register/', userData);
@@ -28,9 +20,14 @@ export const login = async (credentials) => {
   return response.data;
 };
 
-export const logout = async (refresh_token) => {
-  const response = await api.post('/logout/', { refresh: refresh_token });
-  return response.data;
+export const logout = async () => {
+  try {
+    const response = await api.post('/logout/');
+    return response.data;
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
 };
 
 export const refreshToken = async (refresh_token) => {
@@ -52,5 +49,42 @@ export const loginWithMFA = async (credentials) => {
   const response = await api.post('/login/', credentials);
   return response.data;
 };
+
+export const checkAuth = async () => {
+  try {
+    const response = await api.get('/check-auth/');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Add an interceptor to handle token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Only try to refresh if it's a 401 error, not a login request, and hasn't been retried
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/login/') &&
+      !originalRequest.url.includes('/check-auth/')
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        await api.post('/token/refresh/');
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, let the error propagate
+        throw refreshError;
+      }
+    }
+
+    throw error;
+  }
+);
 
 export default api; 

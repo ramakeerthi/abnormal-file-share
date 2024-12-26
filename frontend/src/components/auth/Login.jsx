@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { validateEmail } from '../../utils/validation';
 import { login, loginWithMFA } from '../../services/api';
+import { loginSuccess } from '../../features/auth/authSlice';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -42,12 +47,8 @@ const Login = () => {
           password: formData.password,
           totp_code: formData.totpCode,
         });
-        // Handle successful login with MFA
-        localStorage.setItem('access_token', response.access);
-        localStorage.setItem('refresh_token', response.refresh);
-        localStorage.setItem('username', formData.email);
-        localStorage.setItem('user_role', response.user_role);
-        window.location.href = '/';
+        dispatch(loginSuccess(response.user));
+        navigate('/');
       } else {
         const response = await login({
           email: formData.email,
@@ -56,20 +57,12 @@ const Login = () => {
 
         if (response.mfa_required) {
           setMfaRequired(true);
-          localStorage.setItem('user_role', response.user_role);
         } else if (response.mfa_setup_required) {
-          localStorage.setItem('access_token', response.temp_access_token);
-          localStorage.setItem('refresh_token', response.temp_refresh_token);
-          localStorage.setItem('username', formData.email);
-          localStorage.setItem('user_role', response.user_role);
-          window.location.href = '/mfa-setup';
+          dispatch(loginSuccess(response.user));
+          navigate('/mfa-setup');
         } else {
-          // Normal login success
-          localStorage.setItem('access_token', response.access);
-          localStorage.setItem('refresh_token', response.refresh);
-          localStorage.setItem('username', formData.email);
-          localStorage.setItem('user_role', response.user_role);
-          window.location.href = '/';
+          dispatch(loginSuccess(response.user));
+          navigate('/');
         }
       }
     } catch (error) {
