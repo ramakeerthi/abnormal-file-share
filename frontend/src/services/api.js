@@ -4,6 +4,7 @@ const API_URL = 'https://localhost:8000/accounts';
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 5000,
   withCredentials: true,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',

@@ -17,6 +17,11 @@ from .authentication import CookieJWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
 from .models import User
 from rest_framework.exceptions import PermissionDenied
+from django.core.cache import cache
+from rest_framework.exceptions import Throttled
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -90,6 +95,16 @@ class LoginView(APIView):
     authentication_classes = []
 
     def post(self, request):
+        # Rate limiting
+        ip = request.META.get('REMOTE_ADDR')
+        key = f'login_attempts_{ip}'
+        attempts = cache.get(key, 0)
+        
+        if attempts >= 5:  # 5 attempts per 15 minutes
+            raise Throttled(detail="Too many login attempts. Please try again later.")
+        
+        cache.set(key, attempts + 1, 900)  # 15 minutes timeout
+
         if 'totp_code' in request.data:
             serializer = LoginWithMFASerializer(data=request.data)
         else:
@@ -276,6 +291,13 @@ class UserManagementView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Add validation
+        if new_role not in ['ADMIN', 'USER', 'GUEST']:
+            return Response(
+                {"error": "Invalid role specified"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         try:
             user = User.objects.get(id=user_id)
             if user == request.user:
@@ -286,6 +308,11 @@ class UserManagementView(APIView):
             
             user.role = new_role
             user.save()
+            logger.info(
+                f"User role updated - User: {request.user.email}, "
+                f"Target User ID: {user_id}, "
+                f"New Role: {new_role}"
+            )
             return Response({
                 'id': user.id,
                 'email': user.email,

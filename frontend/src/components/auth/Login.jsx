@@ -68,8 +68,9 @@ const Login = () => {
       }
     } catch (error) {
       setErrors({
-        submit: error.response?.data?.error || 'Login failed. Please try again.',
+        submit: 'Invalid credentials or server error. Please try again.'
       });
+      console.error('Login error:', error);
     }
   };
 
