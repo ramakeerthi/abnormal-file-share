@@ -24,6 +24,9 @@ const NavigationBar = ({ onLogout }) => {
               </>
             ) : (
               <>
+                {user?.role === 'ADMIN' && (
+                  <Nav.Link as={Link} to="/users">User Management</Nav.Link>
+                )}
                 <Navbar.Text className="me-3">
                   Welcome, {user?.email} ({user?.role})
                 </Navbar.Text>

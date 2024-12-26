@@ -15,6 +15,8 @@ from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from .authentication import CookieJWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
+from .models import User
+from rest_framework.exceptions import PermissionDenied
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -73,7 +75,10 @@ class TOTPSetupView(APIView):
         if serializer.is_valid():
             totp = pyotp.TOTP(request.user.totp_secret)
             if totp.verify(serializer.validated_data['totp_code']):
-                return Response({'message': 'MFA setup completed successfully'})
+                response = Response({'message': 'MFA setup completed successfully'})
+                # Clear temporary token cookie
+                response.delete_cookie('temp_token')
+                return response
             return Response(
                 {'error': 'Invalid TOTP code'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -116,6 +121,7 @@ class LoginView(APIView):
             if not user.totp_secret:
                 response_data['mfa_setup_required'] = True
                 response = Response(response_data)
+                # Set temporary token as HTTP-only cookie
                 response.set_cookie(
                     'temp_token',
                     str(refresh.access_token),
@@ -224,6 +230,65 @@ class CookieTokenRefreshView(TokenRefreshView):
                 samesite='Strict',
                 secure=not settings.DEBUG
             )
-            del response.data['access']  # Remove token from response body
+            del response.data['access']
         
         return response
+
+class UserManagementView(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (CookieJWTAuthentication,)
+
+    def get(self, request):
+        if request.user.role != 'ADMIN':
+            raise PermissionDenied("Only admins can access user management")
+        
+        try:            
+            # Get filtered users
+            users = all_users.exclude(id=request.user.id)
+            
+            user_data = [{
+                'id': user.id,
+                'email': user.email,
+                'role': user.role
+            } for user in users]
+            return Response(user_data)
+            
+        except Exception as e:
+            return Response(
+                {"error": "Failed to fetch users"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def put(self, request, *args, **kwargs):
+        if request.user.role != 'ADMIN':
+            raise PermissionDenied("Only admins can update user roles")
+        
+        user_id = request.data.get('id')
+        new_role = request.data.get('role')
+        
+        if not user_id or not new_role:
+            return Response(
+                {"error": "User ID and role are required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user = User.objects.get(id=user_id)
+            if user == request.user:
+                return Response(
+                    {"error": "Cannot modify your own role"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            user.role = new_role
+            user.save()
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'role': user.role
+            })
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )

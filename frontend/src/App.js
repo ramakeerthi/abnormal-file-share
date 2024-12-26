@@ -10,6 +10,7 @@ import Home from './components/Home';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from './features/auth/authSlice';
 import { checkAuth } from './services/api';
+import UserManagement from './components/UserManagement';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -62,6 +63,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Home />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/users" 
+              element={
+                <ProtectedRoute>
+                  <UserManagement />
                 </ProtectedRoute>
               } 
             />
