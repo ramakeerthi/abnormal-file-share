@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from django.utils.html import escape
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,6 +15,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+    def validate_email(self, value):
+        return escape(value.strip().lower())
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

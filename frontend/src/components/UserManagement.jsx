@@ -30,10 +30,15 @@ const UserManagement = () => {
   };
 
   const handleSave = async () => {
+    if (!selectedRole || !['ADMIN', 'USER', 'GUEST'].includes(selectedRole)) {
+      setError('Invalid role selected');
+      return;
+    }
+
     try {
       await updateUserRole(selectedUser.id, selectedRole);
       setShowEditModal(false);
-      fetchUsers(); // Refresh the user list
+      fetchUsers();
     } catch (error) {
       setError('Failed to update user role');
     }
@@ -92,7 +97,7 @@ const UserManagement = () => {
                 onChange={(e) => setSelectedRole(e.target.value)}
               >
                 <option value="ADMIN">Admin</option>
-                <option value="USER">Regular User</option>
+                <option value="USER">User</option>
                 <option value="GUEST">Guest</option>
               </Form.Select>
             </Form.Group>

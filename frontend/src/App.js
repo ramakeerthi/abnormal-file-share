@@ -21,7 +21,6 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     const verifyAuth = async () => {
       try {
@@ -37,6 +36,7 @@ function App() {
     };
 
     verifyAuth();
+    // eslint-disable-next-line
   }, []); // Only run once on mount
 
   if (isLoading) {
