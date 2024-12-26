@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Layout from './components/layout/Layout';
@@ -18,10 +18,11 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-function App() {
+// Main content component that uses the navigate hook
+const MainContent = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -38,8 +39,7 @@ function App() {
     };
 
     verifyAuth();
-    // eslint-disable-next-line
-  }, []); // Only run once on mount
+  }, [dispatch]);
 
   useEffect(() => {
     let inactivityTimer;
@@ -63,44 +63,51 @@ function App() {
   }, [dispatch, navigate]);
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
+    return <div>Loading...</div>;
   }
 
   return (
+    <div className="App">
+      <Layout>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route 
+            path="/mfa-setup" 
+            element={
+              <ProtectedRoute>
+                <MFASetup />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/users" 
+            element={
+              <ProtectedRoute>
+                <UserManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Layout>
+    </div>
+  );
+};
+
+// Main App component
+function App() {
+  return (
     <Router>
-      <div className="App">
-        <Layout>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route 
-              path="/mfa-setup" 
-              element={
-                <ProtectedRoute>
-                  <MFASetup />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/users" 
-              element={
-                <ProtectedRoute>
-                  <UserManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Layout>
-      </div>
+      <MainContent />
     </Router>
   );
 }
