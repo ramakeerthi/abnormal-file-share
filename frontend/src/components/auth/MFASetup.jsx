@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Image } from 'react-bootstrap';
 import { setupMFA, verifyMFA } from '../../services/api';
+import './Auth.css';
 
 const MFASetup = () => {
   const [qrCode, setQrCode] = useState('');
@@ -38,18 +39,18 @@ const MFASetup = () => {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: '100%' }}>
+    <Container className="mfa-container mt-5">
       <div className="text-center mb-5">
-        <h2 className="display-6 fw-bold">Enhance Your Security</h2>
-        <p className="text-muted">Set up two-factor authentication to protect your account</p>
+        <h2 className="mfa-title">Enhance Your Security</h2>
+        <p className="mfa-subtitle">Set up two-factor authentication to protect your account</p>
       </div>
       
       {error && <Alert variant="danger" className="fade show">{error}</Alert>}
       {success && <Alert variant="success" className="fade show">{success}</Alert>}
 
       <div className="d-flex gap-4 mb-4">
-        <div className="card shadow-sm p-4" style={{flex: 1}}>
-          <h5 className="card-title text-primary mb-3">Setup Instructions</h5>
+        <div className="mfa-card" style={{flex: 1}}>
+          <h5 className="auth-title mb-3">Setup Instructions</h5>
           <ol className="list-group list-group-flush list-group-numbered text-start">
             <li className="list-group-item border-0">Download Google Authenticator or any TOTP-based authenticator app.</li>
             <li className="list-group-item border-0">Scan the QR code below with your authenticator app.</li>
@@ -64,8 +65,8 @@ const MFASetup = () => {
         </div>
 
         {qrCode && (
-          <div className="text-center" style={{flex: 1}}>
-            <div className="d-inline-block p-3 bg-light rounded-3">
+          <div className="mfa-card text-center" style={{flex: 1}}>
+            <div className="d-inline-block">
               <Image 
                 src={`data:image/png;base64,${qrCode}`} 
                 alt="QR Code"
@@ -77,11 +78,9 @@ const MFASetup = () => {
         )}
       </div>
 
-      <br />
-
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} className="text-center">
         <Form.Group className="mb-3" style={{ maxWidth: '300px', margin: '0 auto' }}>
-          <Form.Label className="fw-bold fs-4">Verification Code</Form.Label>
+          <Form.Label className="auth-form-label fs-4">Verification Code</Form.Label>
           <Form.Control
             type="text"
             value={code}
@@ -91,7 +90,7 @@ const MFASetup = () => {
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" className="auth-button">
           Verify and Complete Setup
         </Button>
       </Form>

@@ -5,6 +5,8 @@ const API_URL = 'https://localhost:8000/accounts';
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
 });
 
 // The CSRF token will be automatically handled by Django's CSRF middleware
@@ -16,8 +18,13 @@ export const register = async (userData) => {
 };
 
 export const login = async (credentials) => {
-  const response = await api.post('/login/', credentials);
-  return response.data;
+  try {
+    const response = await api.post('/login/', credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
 };
 
 export const logout = async () => {

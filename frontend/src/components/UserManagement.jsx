@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Form, Modal } from 'react-bootstrap';
 import { getUsers, updateUserRole } from '../services/api';
+import './UserManagement.css';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -39,11 +40,11 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>User Management</h2>
+    <div className="container-fluid mt-4">
+      <h2 className="user-management-title">User Management</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       
-      <Table striped bordered hover>
+      <Table hover className="user-table">
         <thead>
           <tr>
             <th>Email</th>
@@ -58,11 +59,11 @@ const UserManagement = () => {
               <td>{user.role}</td>
               <td>
                 <Button 
-                  variant="primary" 
-                  size="sm"
+                  variant="dark"
+                  className="edit-button"
                   onClick={() => handleEdit(user)}
                 >
-                  Edit
+                  Edit Role
                 </Button>
               </td>
             </tr>
@@ -101,7 +102,7 @@ const UserManagement = () => {
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave}>
+          <Button variant="dark" onClick={handleSave}>
             Save Changes
           </Button>
         </Modal.Footer>
@@ -110,4 +111,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement; 
+export default UserManagement;

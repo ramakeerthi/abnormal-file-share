@@ -87,6 +87,7 @@ class TOTPSetupView(APIView):
 
 class LoginView(APIView):
     permission_classes = (AllowAny,)
+    authentication_classes = []
 
     def post(self, request):
         if 'totp_code' in request.data:
@@ -243,7 +244,9 @@ class UserManagementView(APIView):
             raise PermissionDenied("Only admins can access user management")
         
         try:            
-            # Get filtered users
+            # Get all users first
+            all_users = User.objects.all()
+            # Then exclude current user
             users = all_users.exclude(id=request.user.id)
             
             user_data = [{
@@ -254,6 +257,7 @@ class UserManagementView(APIView):
             return Response(user_data)
             
         except Exception as e:
+            print(f"Error in UserManagementView: {str(e)}")  # Add this for debugging
             return Response(
                 {"error": "Failed to fetch users"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

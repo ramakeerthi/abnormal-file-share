@@ -3,6 +3,7 @@ import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { register } from '../../services/api';
 import { Link } from 'react-router-dom';
+import './Auth.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -64,62 +65,64 @@ const Register = () => {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: '500px' }}>
-      <h2 className="mb-4">Register</h2>
-      {success && <Alert variant="success">{success}</Alert>}
-      {errors.submit && <Alert variant="danger">{errors.submit}</Alert>}
-      
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            isInvalid={!!errors.email}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.email}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            isInvalid={!!errors.password}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.password}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Confirm Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            isInvalid={!!errors.confirmPassword}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.confirmPassword}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Button variant="primary" type="submit" className="me-2">
-          Register
-        </Button>
+    <Container className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Register</h2>
+        {success && <Alert variant="success">{success}</Alert>}
+        {errors.submit && <Alert variant="danger">{errors.submit}</Alert>}
         
-        <p className="mt-3">
-          Already have an account? <Link to="/login">Login here</Link>
-        </p>
-      </Form>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label className="auth-form-label">Email address</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              isInvalid={!!errors.email}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.email}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label className="auth-form-label">Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              isInvalid={!!errors.password}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.password}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label className="auth-form-label">Confirm Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              isInvalid={!!errors.confirmPassword}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.confirmPassword}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Button variant="primary" type="submit" className="auth-button me-2">
+            Register
+          </Button>
+          
+          <p className="mt-3">
+            Already have an account? <Link to="/login" className="auth-link">Login here</Link>
+          </p>
+        </Form>
+      </div>
     </Container>
   );
 };

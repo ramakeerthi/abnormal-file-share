@@ -1,38 +1,43 @@
 import React from 'react';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import './Navbar.css';
 
 const NavigationBar = ({ onLogout }) => {
   const location = useLocation();
   const { user, isAuthenticated } = useSelector(state => state.auth);
 
   return (
-    <Navbar bg="black" variant="dark" expand="lg">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          <img src="/FileShare_logo.png" alt="FileShare Logo" height="60em" />
+    <Navbar bg="black" variant="dark" expand="lg" className="custom-navbar">
+      <Container fluid className="px-3">
+        <Navbar.Brand as={Link} to="/" className="me-0 nav-brand">
+          <img src="/FileShare_logo.png" alt="FileShare Logo" height="60" />
         </Navbar.Brand>
+        
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            {isAuthenticated && user?.role === 'ADMIN' && (
+              <Nav.Link as={Link} to="/users" className="ms-3">
+                User Management
+              </Nav.Link>
+            )}
+          </Nav>
+          
           <Nav>
             {!isAuthenticated ? (
-              <>
-                {location.pathname !== '/login' && (
-                  <Nav.Link as={Link} to="/login">Login</Nav.Link>
-                )}
-              </>
+              (location.pathname !== '/login' && location.pathname !== '/register') && (
+                <Nav.Link as={Link} to="/login">Login</Nav.Link>
+              )
             ) : (
               <>
-                {user?.role === 'ADMIN' && (
-                  <Nav.Link as={Link} to="/users">User Management</Nav.Link>
-                )}
                 <Navbar.Text className="me-3">
                   Welcome, {user?.email} ({user?.role})
                 </Navbar.Text>
-                <Button variant="outline-light" onClick={onLogout}>
+                <Nav.Link onClick={onLogout}>
                   Logout
-                </Button>
+                </Nav.Link>
               </>
             )}
           </Nav>

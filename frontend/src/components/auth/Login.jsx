@@ -6,6 +6,7 @@ import { validateEmail } from '../../utils/validation';
 import { login, loginWithMFA } from '../../services/api';
 import { loginSuccess } from '../../features/auth/authSlice';
 import { Link } from 'react-router-dom';
+import './Auth.css';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -73,64 +74,66 @@ const Login = () => {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: '500px' }}>
-      <h2 className="mb-4">Login</h2>
-      {errors.submit && <Alert variant="danger">{errors.submit}</Alert>}
-      
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            isInvalid={!!errors.email}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.email}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            isInvalid={!!errors.password}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.password}
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        {mfaRequired && (
+    <Container className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Login</h2>
+        {errors.submit && <Alert variant="danger">{errors.submit}</Alert>}
+        
+        <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Authentication Code</Form.Label>
+            <Form.Label className="auth-form-label">Email address</Form.Label>
             <Form.Control
-              type="text"
-              name="totpCode"
-              value={formData.totpCode}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
-              isInvalid={!!errors.totpCode}
-              placeholder="Enter 6-digit code"
+              isInvalid={!!errors.email}
             />
             <Form.Control.Feedback type="invalid">
-              {errors.totpCode}
+              {errors.email}
             </Form.Control.Feedback>
           </Form.Group>
-        )}
 
-        <Button variant="primary" type="submit" className="me-2">
-          {mfaRequired ? 'Verify' : 'Login'}
-        </Button>
-        
-        <p className="mt-3">
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
-      </Form>
+          <Form.Group className="mb-3">
+            <Form.Label className="auth-form-label">Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              isInvalid={!!errors.password}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.password}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {mfaRequired && (
+            <Form.Group className="mb-3">
+              <Form.Label className="auth-form-label">Authentication Code</Form.Label>
+              <Form.Control
+                type="text"
+                name="totpCode"
+                value={formData.totpCode}
+                onChange={handleChange}
+                isInvalid={!!errors.totpCode}
+                placeholder="Enter 6-digit code"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.totpCode}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
+
+          <Button variant="primary" type="submit" className="auth-button me-2">
+            {mfaRequired ? 'Verify' : 'Login'}
+          </Button>
+          
+          <p className="mt-3">
+            Don't have an account? <Link to="/register" className="auth-link">Register here</Link>
+          </p>
+        </Form>
+      </div>
     </Container>
   );
 };
