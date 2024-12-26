@@ -27,7 +27,7 @@ const NavigationBar = ({ onLogout }) => {
           
           <Nav>
             {!isAuthenticated ? (
-              location.pathname !== '/login' && (
+              (location.pathname !== '/login' && location.pathname !== '/register') && (
                 <Nav.Link as={Link} to="/login">Login</Nav.Link>
               )
             ) : (
