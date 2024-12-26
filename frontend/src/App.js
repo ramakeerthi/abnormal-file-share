@@ -8,7 +8,7 @@ import Register from './components/auth/Register';
 import MFASetup from './components/auth/MFASetup';
 import Home from './components/Home';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginSuccess } from './features/auth/authSlice';
+import { loginSuccess, logout } from './features/auth/authSlice';
 import { checkAuth } from './services/api';
 import UserManagement from './components/UserManagement';
 
@@ -21,6 +21,8 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const verifyAuth = async () => {
       try {
@@ -38,6 +40,27 @@ function App() {
     verifyAuth();
     // eslint-disable-next-line
   }, []); // Only run once on mount
+
+  useEffect(() => {
+    let inactivityTimer;
+    
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        dispatch(logout());
+        navigate('/login');
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keypress', resetTimer);
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keypress', resetTimer);
+    };
+  }, [dispatch, navigate]);
 
   if (isLoading) {
     return <div>Loading...</div>; // Or your loading component
