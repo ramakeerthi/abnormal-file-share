@@ -11,6 +11,10 @@ import qrcode
 import io
 import base64
 from django.conf import settings
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
+from .authentication import CookieJWTAuthentication
+from rest_framework_simplejwt.views import TokenRefreshView
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -27,6 +31,7 @@ class RegisterView(APIView):
 
 class TOTPSetupView(APIView):
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (CookieJWTAuthentication,)
 
     def get(self, request):
         try:
@@ -99,27 +104,38 @@ class LoginView(APIView):
 
             # Generate temporary token for both MFA setup and verification
             refresh = RefreshToken.for_user(user)
-            temp_tokens = {
-                'temp_access_token': str(refresh.access_token),
-                'temp_refresh_token': str(refresh)
+            
+            response_data = {
+                'user': {
+                    'email': user.email,
+                    'role': user.role,
+                },
+                'csrf_token': get_token(request)
             }
 
-            # If first login (no TOTP secret set)
             if not user.totp_secret:
-                response_data = {
-                    'mfa_setup_required': True,
-                    'user_role': user.role,
-                    **temp_tokens
-                }
-                return Response(response_data, status=status.HTTP_200_OK)
+                response_data['mfa_setup_required'] = True
+                response = Response(response_data)
+                response.set_cookie(
+                    'temp_token',
+                    str(refresh.access_token),
+                    httponly=True,
+                    samesite='Strict',
+                    secure=not settings.DEBUG
+                )
+                return response
 
-            # Always require TOTP code for subsequent logins
             if 'totp_code' not in request.data:
-                return Response({
-                    'mfa_required': True,
-                    'user_role': user.role,
-                    **temp_tokens
-                }, status=status.HTTP_200_OK)
+                response_data['mfa_required'] = True
+                response = Response(response_data)
+                response.set_cookie(
+                    'temp_token',
+                    str(refresh.access_token),
+                    httponly=True,
+                    samesite='Strict',
+                    secure=not settings.DEBUG
+                )
+                return response
 
             try:
                 totp = pyotp.TOTP(user.totp_secret)
@@ -134,40 +150,80 @@ class LoginView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Generate final tokens after successful MFA
-            final_refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(final_refresh),
-                'access': str(final_refresh.access_token),
-                'user_role': user.role,
-            })
+            # Set HTTP-only cookies for JWT tokens
+            response = Response(response_data)
+            response.set_cookie(
+                settings.SIMPLE_JWT['AUTH_COOKIE'],
+                str(refresh.access_token),
+                httponly=True,
+                samesite='Strict',
+                secure=not settings.DEBUG
+            )
+            response.set_cookie(
+                settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+                str(refresh),
+                httponly=True,
+                samesite='Strict',
+                secure=not settings.DEBUG
+            )
+            return response
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (CookieJWTAuthentication,)
 
     def post(self, request):
         try:
-            refresh_token = request.data.get("refresh")
-            
-            if not refresh_token:
-                return Response(
-                    {"error": "Refresh token is required"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            try:
+            refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            if refresh_token:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
-                return Response({"message": "Logged out successfully"})
-            except TokenError as e:
-                return Response(
-                    {"error": f"Token Error: {str(e)}"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            
+            response = Response({"message": "Logged out successfully"})
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            response.delete_cookie('temp_token')
+            return response
         except Exception as e:
             return Response(
                 {"error": f"Unexpected error: {str(e)}"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class CheckAuthView(APIView):
+    permission_classes = (AllowAny,)
+    
+    def get(self, request):
+        if request.user.is_authenticated:
+            return Response({
+                'authenticated': True,
+                'user': {
+                    'email': request.user.email,
+                    'role': request.user.role,
+                }
+            })
+        return Response({
+            'authenticated': False,
+            'user': None
+        }, status=status.HTTP_200_OK)  # Return 200 even when not authenticated
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+        if refresh_token:
+            request.data['refresh'] = refresh_token
+        response = super().post(request, *args, **kwargs)
+        
+        if response.status_code == 200:
+            response.set_cookie(
+                settings.SIMPLE_JWT['AUTH_COOKIE'],
+                response.data['access'],
+                httponly=True,
+                samesite='Strict',
+                secure=not settings.DEBUG
+            )
+            del response.data['access']  # Remove token from response body
+        
+        return response
