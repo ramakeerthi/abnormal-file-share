@@ -13,12 +13,15 @@ class CookieJWTAuthentication(JWTAuthentication):
                 pass
 
         # Then check for regular token
-        raw_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE']) or None
+        raw_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE'])
         if raw_token is None:
             return None
 
-        validated_token = self.get_validated_token(raw_token)
-        return self.get_user(validated_token), validated_token
+        try:
+            validated_token = self.get_validated_token(raw_token)
+            return self.get_user(validated_token), validated_token
+        except:
+            return None
 
     def authenticate_header(self, request):
         return 'Bearer' 
