@@ -59,6 +59,16 @@ export const checkAuth = async () => {
   }
 };
 
+export const getUsers = async () => {
+  const response = await api.get('/users/');
+  return response.data;
+};
+
+export const updateUserRole = async (userId, role) => {
+  const response = await api.put('/users/', { id: userId, role });
+  return response.data;
+};
+
 // Add an interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
