@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'accounts',
     'rest_framework_simplejwt.token_blacklist',
+    'django_extensions',
 ]
 
 # Custom User Model
@@ -47,15 +48,16 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # SSL/TLS Settings
 SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# SSL Certificate paths for development
-SSL_CERTIFICATE = os.path.join(BASE_DIR, 'certificates', 'localhost.crt')
-SSL_PRIVATE_KEY = os.path.join(BASE_DIR, 'certificates', 'localhost.key')
+# SSL Certificate paths
+SSL_CERTIFICATE = os.path.join(BASE_DIR, 'certificates/localhost.crt')
+SSL_PRIVATE_KEY = os.path.join(BASE_DIR, 'certificates/localhost.key')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -185,5 +187,13 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    'https://localhost:3000',
 ]
+CORS_ALLOW_CREDENTIALS = True
+
+# If you're using channels/websockets, configure them for SSL
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
