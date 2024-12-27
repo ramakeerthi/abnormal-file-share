@@ -28,6 +28,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('ADMIN', 'Admin'),
+        ('USER', 'User'),
         ('GUEST', 'Guest'),
     ]
     
