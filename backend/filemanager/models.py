@@ -17,6 +17,11 @@ class File(models.Model):
     file_size = models.BigIntegerField()
     original_name = models.CharField(max_length=255)
     content_type = models.CharField(max_length=100)
+    shared_with = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='shared_files',
+        blank=True
+    )
     
     class Meta:
         ordering = ['-uploaded_at']

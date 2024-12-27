@@ -103,6 +103,18 @@ export const deleteFile = async (fileId) => {
   return response.data;
 };
 
+export const getSharedFiles = async () => {
+  const response = await api.get('/files/shared/');
+  return response.data;
+};
+
+export const shareFile = async (fileId, email) => {
+  const response = await api.post(`/files/${fileId}/share/`, {
+    email: email
+  });
+  return response.data;
+};
+
 // Add an interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,

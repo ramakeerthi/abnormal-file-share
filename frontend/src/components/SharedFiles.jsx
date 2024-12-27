@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Form, Alert, Modal } from 'react-bootstrap';
-import { uploadFile, downloadFile, getFiles, deleteFile, shareFile } from '../services/api';
+import { Container, Table, Button, Alert, Modal, Form } from 'react-bootstrap';
+import { getSharedFiles, downloadFile, deleteFile, shareFile } from '../services/api';
 import './FileManager.css';
 
-const FileManager = () => {
+const SharedFiles = () => {
   const [files, setFiles] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
@@ -18,36 +16,10 @@ const FileManager = () => {
 
   const fetchFiles = async () => {
     try {
-      const data = await getFiles();
+      const data = await getSharedFiles();
       setFiles(data);
     } catch (error) {
-      setError('Failed to fetch files');
-    }
-  };
-
-  const handleFileSelect = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!selectedFile) {
-      setError('Please select a file');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      await uploadFile(formData);
-      await fetchFiles();
-      setSelectedFile(null);
-      e.target.reset();
-    } catch (error) {
-      setError('Failed to upload file');
-    } finally {
-      setLoading(false);
+      setError('Failed to fetch shared files');
     }
   };
 
@@ -73,7 +45,6 @@ const FileManager = () => {
       window.URL.revokeObjectURL(url);
       link.remove();
     } catch (error) {
-      console.error('Download error:', error);
       setError('Failed to download file');
     }
   };
@@ -82,9 +53,8 @@ const FileManager = () => {
     if (window.confirm('Are you sure you want to delete this file?')) {
       try {
         await deleteFile(fileId);
-        await fetchFiles();  // Refresh the file list
+        await fetchFiles();
       } catch (error) {
-        console.error('Delete error:', error);
         setError('Failed to delete file');
       }
     }
@@ -102,7 +72,6 @@ const FileManager = () => {
       setUserEmailToShare('');
       setError('');
     } catch (error) {
-      console.log('Share error:', error.response?.data);
       if (error.response?.data?.error) {
         setError(error.response.data.error);
       } else {
@@ -113,29 +82,9 @@ const FileManager = () => {
 
   return (
     <Container className="file-manager mt-4">
-      <h2 className="file-manager-title">File Manager</h2>
+      <h2 className="file-manager-title">Shared Files</h2>
       
       {error && <Alert variant="danger">{error}</Alert>}
-      
-      <Form onSubmit={handleUpload} className="upload-form mb-4">
-        <Form.Group>
-          <Form.Label>Upload File</Form.Label>
-          <div className="d-flex">
-            <Form.Control
-              type="file"
-              onChange={handleFileSelect}
-              className="me-2"
-            />
-            <Button 
-              type="submit" 
-              variant="dark" 
-              disabled={loading}
-            >
-              {loading ? 'Uploading...' : 'Upload'}
-            </Button>
-          </div>
-        </Form.Group>
-      </Form>
 
       <Table hover className="file-table">
         <thead>
@@ -143,6 +92,7 @@ const FileManager = () => {
             <th>Name</th>
             <th>Size</th>
             <th>Uploaded At</th>
+            <th>Owner</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -152,32 +102,35 @@ const FileManager = () => {
               <td>{file.original_name}</td>
               <td>{Math.round(file.file_size / 1024)} KB</td>
               <td>{new Date(file.uploaded_at).toLocaleString()}</td>
+              <td>{file.owner_email}</td>
               <td>
-                {file.is_owner && (
-                  <div className="d-flex gap-2">
-                    <Button
-                      variant="dark"
-                      size="sm"
-                      onClick={() => handleDownload(file.id)}
-                    >
-                      Download
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDelete(file.id)}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      variant="info"
-                      size="sm"
-                      onClick={() => handleShare(file.id)}
-                    >
-                      Share
-                    </Button>
-                  </div>
-                )}
+                <div className="d-flex gap-2">
+                  <Button
+                    variant="dark"
+                    size="sm"
+                    onClick={() => handleDownload(file.id)}
+                  >
+                    Download
+                  </Button>
+                  {file.can_manage && (
+                    <>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDelete(file.id)}
+                      >
+                        Delete
+                      </Button>
+                      <Button
+                        variant="info"
+                        size="sm"
+                        onClick={() => handleShare(file.id)}
+                      >
+                        Share
+                      </Button>
+                    </>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -215,4 +168,4 @@ const FileManager = () => {
   );
 };
 
-export default FileManager; 
+export default SharedFiles; 
