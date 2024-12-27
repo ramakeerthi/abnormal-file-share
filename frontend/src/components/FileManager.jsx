@@ -11,7 +11,7 @@ const FileManager = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
-  const [sharePermission, setSharePermission] = useState('DOWNLOAD');
+  const [sharePermission, setSharePermission] = useState('VIEW');
 
   useEffect(() => {
     fetchFiles();
