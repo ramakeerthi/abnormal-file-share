@@ -31,3 +31,10 @@ certificates/
 *.crt
 *.key
 *.pem
+
+# Media files
+media/
+*/media/
+backend/media/
+backend/media/encrypted_files/
+backend/media/*

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'rest_framework_simplejwt.token_blacklist',
     'django_extensions',
+    'filemanager',
 ]
 
 # Custom User Model
@@ -213,3 +214,10 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+# Add these settings for file uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Add encryption key settings
+FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY', 'your-secure-key-here')  # In production, use environment variable

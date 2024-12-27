@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, logout } from './features/auth/authSlice';
 import { checkAuth } from './services/api';
 import UserManagement from './components/UserManagement';
+import FileManager from './components/FileManager';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -93,6 +94,14 @@ const MainContent = () => {
             element={
               <ProtectedRoute>
                 <UserManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/files" 
+            element={
+              <ProtectedRoute>
+                <FileManager />
               </ProtectedRoute>
             } 
           />
