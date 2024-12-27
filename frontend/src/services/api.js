@@ -8,14 +8,21 @@ const api = axios.create({
   withCredentials: true,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // The CSRF token will be automatically handled by Django's CSRF middleware
 // No need to manually set it in headers
 
 export const register = async (userData) => {
-  const response = await api.post('/accounts/register/', userData);
-  return response.data;
+  try {
+    const response = await api.post('/accounts/register/', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const login = async (credentials) => {

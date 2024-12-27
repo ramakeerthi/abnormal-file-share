@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
         'accounts.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
 
@@ -178,7 +178,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_REFRESH': 'refresh_token',
     'AUTH_COOKIE_DOMAIN': None,
-    'AUTH_COOKIE_SECURE': not DEBUG,
+    'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_SAMESITE': 'Strict',
@@ -189,6 +189,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 # If you're using channels/websockets, configure them for SSL
 CHANNEL_LAYERS = {
@@ -231,3 +232,9 @@ def get_env_value(env_variable):
 FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY')
 if not FILE_ENCRYPTION_KEY:
     raise ImproperlyConfigured('FILE_ENCRYPTION_KEY environment variable is required')
+
+# CSRF Settings
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_NAME = 'csrftoken'
