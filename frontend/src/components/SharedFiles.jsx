@@ -27,7 +27,6 @@ const SharedFiles = () => {
     try {
       await downloadFile(fileId);
     } catch (error) {
-      console.error('Download error:', error);
       if (error.message === 'File no longer exists' || 
           error.message === 'File not found' ||
           error.message === 'File is corrupted or unavailable') {

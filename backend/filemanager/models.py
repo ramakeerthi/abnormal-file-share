@@ -35,7 +35,8 @@ class File(models.Model):
             try:
                 self.file.delete()
             except Exception as e:
-                print(f"Error deleting file: {e}")
+                # Remove print statement and handle silently
+                pass
         
         # Clear shared_with relationships before deleting
         self.shared_with.clear()
