@@ -98,6 +98,11 @@ export const downloadFile = async (fileId) => {
   return response;
 };
 
+export const deleteFile = async (fileId) => {
+  const response = await api.delete(`/files/${fileId}/`);
+  return response.data;
+};
+
 // Add an interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,

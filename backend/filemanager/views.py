@@ -15,7 +15,7 @@ class FileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.action in ['create', 'list', 'retrieve', 'download']:
+        if self.action in ['create', 'list', 'retrieve', 'download', 'destroy']:
             return [IsAuthenticated()]
         return [IsAuthenticated()]  # Default to IsAuthenticated for all other actions
 
@@ -106,5 +106,30 @@ class FileViewSet(viewsets.ModelViewSet):
             print(f"Download error: {str(e)}")  # Add logging for debugging
             return Response(
                 {'error': 'Failed to download file'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            ) 
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user.role != 'ADMIN' and instance.uploaded_by != request.user:
+            return Response(
+                {'error': 'You do not have permission to delete this file'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        try:
+            # Delete the physical file
+            file_path = os.path.join(settings.MEDIA_ROOT, str(instance.file))
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            # Delete the database record
+            instance.delete()
+            
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            print(f"Delete error: {str(e)}")
+            return Response(
+                {'error': 'Failed to delete file'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 

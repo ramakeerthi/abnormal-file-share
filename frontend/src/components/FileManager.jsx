@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Form, Alert } from 'react-bootstrap';
-import { uploadFile, downloadFile, getFiles } from '../services/api';
+import { uploadFile, downloadFile, getFiles, deleteFile } from '../services/api';
 import './FileManager.css';
 
 const FileManager = () => {
@@ -75,6 +75,18 @@ const FileManager = () => {
     }
   };
 
+  const handleDelete = async (fileId) => {
+    if (window.confirm('Are you sure you want to delete this file?')) {
+      try {
+        await deleteFile(fileId);
+        await fetchFiles();  // Refresh the file list
+      } catch (error) {
+        console.error('Delete error:', error);
+        setError('Failed to delete file');
+      }
+    }
+  };
+
   return (
     <Container className="file-manager mt-4">
       <h2 className="file-manager-title">File Manager</h2>
@@ -118,13 +130,22 @@ const FileManager = () => {
               <td>{new Date(file.uploaded_at).toLocaleString()}</td>
               <td>
                 {file.is_owner && (
-                  <Button
-                    variant="dark"
-                    size="sm"
-                    onClick={() => handleDownload(file.id)}
-                  >
-                    Download
-                  </Button>
+                  <div className="d-flex gap-2">
+                    <Button
+                      variant="dark"
+                      size="sm"
+                      onClick={() => handleDownload(file.id)}
+                    >
+                      Download
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(file.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 )}
               </td>
             </tr>
