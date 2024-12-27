@@ -1,11 +1,9 @@
 from django.db import models
 from django.conf import settings
-from cryptography.fernet import Fernet
 import os
 import uuid
 
 def user_directory_path(instance, filename):
-    # Files will be uploaded to media/encrypted_files/<username>/<filename>
     return f'encrypted_files/{instance.uploaded_by.email}/{filename}'
 
 class File(models.Model):
@@ -17,11 +15,6 @@ class File(models.Model):
     file_size = models.BigIntegerField()
     original_name = models.CharField(max_length=255)
     content_type = models.CharField(max_length=100)
-    shared_with = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='shared_files',
-        blank=True
-    )
     
     class Meta:
         ordering = ['-uploaded_at']
@@ -30,16 +23,23 @@ class File(models.Model):
         return self.original_name 
 
     def delete(self, *args, **kwargs):
-        # Delete the actual file from storage
         if self.file:
             try:
                 self.file.delete()
             except Exception as e:
-                # Remove print statement and handle silently
                 pass
-        
-        # Clear shared_with relationships before deleting
-        self.shared_with.clear()
-        
-        # Call the parent class delete method
-        super().delete(*args, **kwargs) 
+        super().delete(*args, **kwargs)
+
+class FileShare(models.Model):
+    PERMISSION_CHOICES = [
+        ('VIEW', 'View Only'),
+        ('DOWNLOAD', 'View and Download')
+    ]
+    
+    file = models.ForeignKey(File, on_delete=models.CASCADE, related_name='shares')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='shared_files')
+    permission = models.CharField(max_length=10, choices=PERMISSION_CHOICES, default='DOWNLOAD')
+    shared_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('file', 'user') 

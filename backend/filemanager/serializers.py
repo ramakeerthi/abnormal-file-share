@@ -1,36 +1,41 @@
 from rest_framework import serializers
-from .models import File
-from accounts.models import User
+from .models import File, FileShare
 
-class UserSerializer(serializers.ModelSerializer):
+class FileShareSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'email']
+        model = FileShare
+        fields = ('user', 'permission')
 
 class FileSerializer(serializers.ModelSerializer):
-    uploaded_by = serializers.ReadOnlyField(source='uploaded_by.email')
+    owner_email = serializers.EmailField(source='uploaded_by.email', read_only=True)
     is_owner = serializers.SerializerMethodField()
-    owner_email = serializers.ReadOnlyField(source='uploaded_by.email')
-    shared_with = UserSerializer(many=True, read_only=True)
+    can_download = serializers.SerializerMethodField()
     can_manage = serializers.SerializerMethodField()
     
     class Meta:
         model = File
-        fields = ['id', 'name', 'uploaded_by', 'uploaded_at', 'file_size', 
-                 'original_name', 'content_type', 'is_owner', 'owner_email', 
-                 'shared_with', 'can_manage']
+        fields = ['id', 'name', 'original_name', 'file_size', 'uploaded_at', 
+                 'owner_email', 'is_owner', 'can_download', 'can_manage']
 
     def get_is_owner(self, obj):
         request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            return obj.uploaded_by == request.user or request.user.role == 'ADMIN'
-        return False
+        return request.user == obj.uploaded_by
+
+    def get_can_download(self, obj):
+        request = self.context.get('request')
+        # Admin can always download
+        if request.user.role == 'ADMIN':
+            return True
+        # Owner can always download
+        if request.user == obj.uploaded_by:
+            return True
+        # Check share permissions for other users
+        try:
+            share = FileShare.objects.get(file=obj, user=request.user)
+            return share.permission == 'DOWNLOAD'
+        except FileShare.DoesNotExist:
+            return False
 
     def get_can_manage(self, obj):
         request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            return obj.uploaded_by == request.user or request.user.role == 'ADMIN'
-        return False
-
-class FileShareSerializer(serializers.Serializer):
-    email = serializers.EmailField() 
+        return request.user == obj.uploaded_by or request.user.role == 'ADMIN' 

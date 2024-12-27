@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django.http import HttpResponse
-from .models import File
+from .models import File, FileShare
 from .serializers import FileSerializer, FileShareSerializer
 from .utils import encrypt_file, decrypt_file
 import os
@@ -33,13 +33,12 @@ class FileViewSet(viewsets.ModelViewSet):
         if action == 'list':
             return File.objects.filter(uploaded_by=user)
         
-        # For other actions (like download, share, etc.), admins can access all files
-        # and regular users can access their own files and shared files
+        # For other actions, show files user has access to
         if user.role == 'ADMIN':
             return File.objects.all()
         return File.objects.filter(
             models.Q(uploaded_by=user) | 
-            models.Q(shared_with=user)
+            models.Q(shares__user=user)
         ).distinct()
 
     def perform_create(self, serializer):
@@ -189,9 +188,9 @@ class FileViewSet(viewsets.ModelViewSet):
             files = File.objects.exclude(uploaded_by=request.user)
         else:
             # For regular users, show only files shared with them
-            files = File.objects.filter(shared_with=request.user)
+            files = File.objects.filter(shares__user=request.user)
         
-        serializer = self.get_serializer(files, many=True)
+        serializer = self.get_serializer(files, many=True, context={'request': request})
         return Response(serializer.data) 
 
 class FileUploadView(APIView):
@@ -238,16 +237,26 @@ class FileDownloadView(APIView):
             file = File.objects.get(id=file_id)
             
             # Check if user has access to file
-            if not (file.uploaded_by == request.user or request.user in file.shared_with.all()):
+            has_access = (
+                request.user.role == 'ADMIN' or  # Admin can always download
+                file.uploaded_by == request.user or  # Owner can always download
+                FileShare.objects.filter(  # Check share permissions
+                    file=file, 
+                    user=request.user,
+                    permission='DOWNLOAD'
+                ).exists()
+            )
+
+            if not has_access:
                 return Response(
-                    {"error": "You don't have permission to access this file"},
+                    {"error": "You don't have permission to download this file"},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
             # Check if file exists on disk
             if not file.file or not os.path.exists(file.file.path):
-                # Remove sharing relationships if file doesn't exist
-                file.shared_with.clear()
+                # Remove sharing relationships
+                FileShare.objects.filter(file=file).delete()
                 file.delete()
                 return Response(
                     {"error": "File no longer exists"},
@@ -260,7 +269,7 @@ class FileDownloadView(APIView):
                     encrypted_data = f.read()
             except IOError:
                 # Handle case where file can't be read
-                file.shared_with.clear()
+                FileShare.objects.filter(file=file).delete()
                 file.delete()
                 return Response(
                     {"error": "File is corrupted or unavailable"},
@@ -287,5 +296,65 @@ class FileDownloadView(APIView):
         except File.DoesNotExist:
             return Response(
                 {"error": "File not found"},
+                status=status.HTTP_404_NOT_FOUND
+            ) 
+
+class FileShareView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, file_id):
+        try:
+            file = File.objects.get(id=file_id)
+            
+            # Check if user is the owner
+            if file.uploaded_by != request.user:
+                return Response(
+                    {"error": "You don't have permission to share this file"}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Validate input
+            email = request.data.get('email')
+            permission = request.data.get('permission', 'DOWNLOAD')
+            
+            if not email:
+                return Response(
+                    {"error": "Email is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            if permission not in ['VIEW', 'DOWNLOAD']:
+                return Response(
+                    {"error": "Invalid permission type"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response(
+                    {"error": "User not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Don't share with file owner
+            if user == file.uploaded_by:
+                return Response(
+                    {"error": "Cannot share file with yourself"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Create or update share
+            FileShare.objects.update_or_create(
+                file=file,
+                user=user,
+                defaults={'permission': permission}
+            )
+            
+            return Response({"message": "File shared successfully"})
+            
+        except File.DoesNotExist:
+            return Response(
+                {"error": "File not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             ) 
