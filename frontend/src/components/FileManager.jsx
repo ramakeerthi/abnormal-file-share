@@ -11,6 +11,7 @@ const FileManager = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
+  const [sharePermission, setSharePermission] = useState('DOWNLOAD');
 
   useEffect(() => {
     fetchFiles();
@@ -77,13 +78,17 @@ const FileManager = () => {
 
   const handleShareSubmit = async () => {
     try {
-      await shareFile(selectedFileId, userEmailToShare);
+      await shareFile(selectedFileId, userEmailToShare, sharePermission);
       setShowShareModal(false);
       setUserEmailToShare('');
+      setSharePermission('DOWNLOAD');
       setError('');
+      await fetchFiles();
     } catch (error) {
       if (error.response?.data?.error) {
         setError(error.response.data.error);
+      } else if (error.response?.data?.detail) {
+        setError(error.response.data.detail);
       } else {
         setError('Failed to share file');
       }
@@ -170,7 +175,7 @@ const FileManager = () => {
         <Modal.Body>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>User Email</Form.Label>
               <Form.Control
                 type="email"
@@ -178,6 +183,16 @@ const FileManager = () => {
                 onChange={(e) => setUserEmailToShare(e.target.value)}
                 placeholder="Enter user email to share with"
               />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Permission Level</Form.Label>
+              <Form.Select
+                value={sharePermission}
+                onChange={(e) => setSharePermission(e.target.value)}
+              >
+                <option value="VIEW">View Only</option>
+                <option value="DOWNLOAD">View and Download</option>
+              </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>

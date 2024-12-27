@@ -91,29 +91,31 @@ const SharedFiles = () => {
               <td>{new Date(file.uploaded_at).toLocaleString()}</td>
               <td>{file.owner_email}</td>
               <td>
-                <div className="d-flex gap-2">
-                  <Button
-                    variant="dark"
-                    size="sm"
-                    onClick={() => handleDownload(file.id)}
-                  >
-                    Download
-                  </Button>
+                <div className="d-flex gap-2 justify-content-center">
+                  {(file.can_download) && (
+                    <Button
+                      variant="dark"
+                      size="sm"
+                      onClick={() => handleDownload(file.id)}
+                    >
+                      Download
+                    </Button>
+                  )}
                   {file.can_manage && (
                     <>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDelete(file.id)}
-                      >
-                        Delete
-                      </Button>
                       <Button
                         variant="info"
                         size="sm"
                         onClick={() => handleShare(file.id)}
                       >
                         Share
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDelete(file.id)}
+                      >
+                        Delete
                       </Button>
                     </>
                   )}

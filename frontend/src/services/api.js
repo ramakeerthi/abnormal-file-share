@@ -13,6 +13,25 @@ const api = axios.create({
   }
 });
 
+// Add request interceptor to handle authentication
+api.interceptors.request.use(
+  (config) => {
+    // Get CSRF token from cookie if it exists
+    const csrfToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1];
+
+    if (csrfToken) {
+      config.headers['X-CSRFToken'] = csrfToken;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // The CSRF token will be automatically handled by Django's CSRF middleware
 // No need to manually set it in headers
 
@@ -195,11 +214,16 @@ export const getSharedFiles = async () => {
   return response.data;
 };
 
-export const shareFile = async (fileId, email) => {
-  const response = await api.post(`/files/${fileId}/share/`, {
-    email: email
-  });
-  return response.data;
+export const shareFile = async (fileId, email, permission) => {
+  try {
+    const response = await api.post(`/files/${fileId}/share/`, {
+      email,
+      permission
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Add an interceptor to handle token refresh
