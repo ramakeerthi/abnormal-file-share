@@ -25,16 +25,25 @@ logger = logging.getLogger(__name__)
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
+    authentication_classes = []
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
+            response = Response(
                 {"message": "User registered successfully"},
                 status=status.HTTP_201_CREATED
             )
+            # Ensure CSRF token is set
+            get_token(request)
+            return response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def options(self, request, *args, **kwargs):
+        response = Response()
+        response['X-CSRFToken'] = get_token(request)
+        return response
 
 class TOTPSetupView(APIView):
     permission_classes = (IsAuthenticated,)

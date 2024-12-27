@@ -8,14 +8,21 @@ const api = axios.create({
   withCredentials: true,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // The CSRF token will be automatically handled by Django's CSRF middleware
 // No need to manually set it in headers
 
 export const register = async (userData) => {
-  const response = await api.post('/accounts/register/', userData);
-  return response.data;
+  try {
+    const response = await api.post('/accounts/register/', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const login = async (credentials) => {
@@ -92,14 +99,106 @@ export const uploadFile = async (formData) => {
 };
 
 export const downloadFile = async (fileId) => {
-  const response = await api.get(`/files/${fileId}/download/`, {
-    responseType: 'blob',
-  });
-  return response;
+  try {
+    const response = await api.get(`/files/download/${fileId}/`);
+    
+    if (response.data.error) {
+      throw new Error(response.data.error);
+    }
+    
+    // Convert base64 strings back to Uint8Arrays
+    const salt = base64ToArrayBuffer(response.data.salt);
+    const iv = base64ToArrayBuffer(response.data.iv);
+    const content = base64ToArrayBuffer(response.data.content);
+    
+    // Generate decryption key
+    const encoder = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      encoder.encode(process.env.REACT_APP_FILE_KEY),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    
+    // Derive the key using PBKDF2
+    const key = await window.crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      256 // 256 bits for AES-256
+    );
+    
+    // Import the derived bits as an AES-CBC key
+    const aesKey = await window.crypto.subtle.importKey(
+      'raw',
+      key,
+      { name: 'AES-CBC' },
+      false,
+      ['decrypt']
+    );
+    
+    // Decrypt the file
+    const decryptedContent = await window.crypto.subtle.decrypt(
+      {
+        name: 'AES-CBC',
+        iv: iv
+      },
+      aesKey,
+      content
+    );
+    
+    // Remove padding
+    const paddingLength = new Uint8Array(decryptedContent)[decryptedContent.byteLength - 1];
+    const unpadded = decryptedContent.slice(0, decryptedContent.byteLength - paddingLength);
+    
+    // Create and download the file
+    const blob = new Blob([unpadded], { type: response.data.content_type });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', response.data.filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    }
+    console.error('Download error:', error);
+    throw error;
+  }
+};
+
+// Helper function to convert base64 to ArrayBuffer
+const base64ToArrayBuffer = (base64) => {
+  const binaryString = window.atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
 };
 
 export const deleteFile = async (fileId) => {
   const response = await api.delete(`/files/${fileId}/`);
+  return response.data;
+};
+
+export const getSharedFiles = async () => {
+  const response = await api.get('/files/shared/');
+  return response.data;
+};
+
+export const shareFile = async (fileId, email) => {
+  const response = await api.post(`/files/${fileId}/share/`, {
+    email: email
+  });
   return response.data;
 };
 

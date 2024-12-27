@@ -23,9 +23,16 @@ const NavigationBar = ({ onLogout }) => {
                 User Management
               </Nav.Link>
             )}
-            <Nav.Link as={Link} to="/files" className="ms-3">
-              File Manager
-            </Nav.Link>
+            {isAuthenticated && user?.role !== 'GUEST' && (
+              <Nav.Link as={Link} to="/files" className="ms-3">
+                File Manager
+              </Nav.Link>
+            )}
+            {isAuthenticated && (
+              <Nav.Link as={Link} to="/shared" className="ms-3">
+                Shared Files
+              </Nav.Link>
+            )}
           </Nav>
           
           <Nav>

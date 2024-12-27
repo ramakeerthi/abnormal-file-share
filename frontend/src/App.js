@@ -12,6 +12,7 @@ import { loginSuccess, logout } from './features/auth/authSlice';
 import { checkAuth } from './services/api';
 import UserManagement from './components/UserManagement';
 import FileManager from './components/FileManager';
+import SharedFiles from './components/SharedFiles';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -102,6 +103,14 @@ const MainContent = () => {
             element={
               <ProtectedRoute>
                 <FileManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/shared" 
+            element={
+              <ProtectedRoute>
+                <SharedFiles />
               </ProtectedRoute>
             } 
           />

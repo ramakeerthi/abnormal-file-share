@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Load environment variables
 load_dotenv()
@@ -157,7 +158,7 @@ REST_FRAMEWORK = {
         'accounts.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
 
@@ -177,7 +178,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE': 'access_token',
     'AUTH_COOKIE_REFRESH': 'refresh_token',
     'AUTH_COOKIE_DOMAIN': None,
-    'AUTH_COOKIE_SECURE': not DEBUG,
+    'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_SAMESITE': 'Strict',
@@ -188,6 +189,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 # If you're using channels/websockets, configure them for SSL
 CHANNEL_LAYERS = {
@@ -219,5 +221,20 @@ X_FRAME_OPTIONS = 'DENY'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Add encryption key settings
-FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY', 'your-secure-key-here')  # In production, use environment variable
+def get_env_value(env_variable):
+    try:
+        return os.environ[env_variable]
+    except KeyError:
+        error_msg = f'Set the {env_variable} environment variable'
+        raise ImproperlyConfigured(error_msg)
+
+# Get encryption key from environment
+FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY')
+if not FILE_ENCRYPTION_KEY:
+    raise ImproperlyConfigured('FILE_ENCRYPTION_KEY environment variable is required')
+
+# CSRF Settings
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_NAME = 'csrftoken'
