@@ -55,7 +55,6 @@ const FileManager = () => {
     try {
       await downloadFile(fileId);
     } catch (error) {
-      console.error('Download error:', error);
       setError('Failed to download file. Please try again.');
     }
   };
@@ -64,9 +63,8 @@ const FileManager = () => {
     if (window.confirm('Are you sure you want to delete this file?')) {
       try {
         await deleteFile(fileId);
-        await fetchFiles();  // Refresh the file list
+        await fetchFiles();
       } catch (error) {
-        console.error('Delete error:', error);
         setError('Failed to delete file');
       }
     }
@@ -84,7 +82,6 @@ const FileManager = () => {
       setUserEmailToShare('');
       setError('');
     } catch (error) {
-      console.log('Share error:', error.response?.data);
       if (error.response?.data?.error) {
         setError(error.response.data.error);
       } else {
@@ -136,7 +133,7 @@ const FileManager = () => {
               <td>{new Date(file.uploaded_at).toLocaleString()}</td>
               <td>
                 {file.is_owner && (
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 justify-content-center">
                     <Button
                       variant="dark"
                       size="sm"
@@ -145,18 +142,18 @@ const FileManager = () => {
                       Download
                     </Button>
                     <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDelete(file.id)}
-                    >
-                      Delete
-                    </Button>
-                    <Button
                       variant="info"
                       size="sm"
                       onClick={() => handleShare(file.id)}
                     >
                       Share
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(file.id)}
+                    >
+                      Delete
                     </Button>
                   </div>
                 )}

@@ -109,7 +109,7 @@ class LoginView(APIView):
         key = f'login_attempts_{ip}'
         attempts = cache.get(key, 0)
         
-        if attempts >= 15:  # 5 attempts per 15 minutes
+        if attempts >= 20:  # 20 attempts per 15 minutes
             raise Throttled(detail="Too many login attempts. Please try again later.")
         
         cache.set(key, attempts + 1, 900)  # 15 minutes timeout
@@ -281,7 +281,6 @@ class UserManagementView(APIView):
             return Response(user_data)
             
         except Exception as e:
-            print(f"Error in UserManagementView: {str(e)}")  # Add this for debugging
             return Response(
                 {"error": "Failed to fetch users"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
