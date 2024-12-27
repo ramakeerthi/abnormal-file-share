@@ -25,27 +25,15 @@ const SharedFiles = () => {
 
   const handleDownload = async (fileId) => {
     try {
-      const response = await downloadFile(fileId);
-      const contentDisposition = response.headers['content-disposition'];
-      let filename = 'download';
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/['"]/g, '');
-        }
-      }
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-      link.remove();
+      await downloadFile(fileId);
     } catch (error) {
-      setError('Failed to download file');
+      console.error('Download error:', error);
+      if (error.message === 'File no longer exists' || 
+          error.message === 'File not found' ||
+          error.message === 'File is corrupted or unavailable') {
+        await fetchFiles();
+      }
+      setError(error.message || 'Failed to download file. Please try again.');
     }
   };
 

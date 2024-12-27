@@ -28,3 +28,17 @@ class File(models.Model):
 
     def __str__(self):
         return self.original_name 
+
+    def delete(self, *args, **kwargs):
+        # Delete the actual file from storage
+        if self.file:
+            try:
+                self.file.delete()
+            except Exception as e:
+                print(f"Error deleting file: {e}")
+        
+        # Clear shared_with relationships before deleting
+        self.shared_with.clear()
+        
+        # Call the parent class delete method
+        super().delete(*args, **kwargs) 

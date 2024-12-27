@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Load environment variables
 load_dotenv()
@@ -219,5 +220,14 @@ X_FRAME_OPTIONS = 'DENY'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Add encryption key settings
-FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY', 'your-secure-key-here')  # In production, use environment variable
+def get_env_value(env_variable):
+    try:
+        return os.environ[env_variable]
+    except KeyError:
+        error_msg = f'Set the {env_variable} environment variable'
+        raise ImproperlyConfigured(error_msg)
+
+# Get encryption key from environment
+FILE_ENCRYPTION_KEY = os.getenv('FILE_ENCRYPTION_KEY')
+if not FILE_ENCRYPTION_KEY:
+    raise ImproperlyConfigured('FILE_ENCRYPTION_KEY environment variable is required')
