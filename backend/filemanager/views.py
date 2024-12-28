@@ -19,6 +19,8 @@ from django.http import FileResponse
 from django.utils.encoding import smart_str
 import io
 import logging
+from django.core.files.storage import default_storage
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -143,29 +145,34 @@ class FileViewSet(viewsets.ModelViewSet):
             )
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if request.user.role != 'ADMIN' and instance.uploaded_by != request.user:
-            return Response(
-                {'error': 'You do not have permission to delete this file'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
         try:
-            # Delete the physical file
-            file_path = os.path.join(settings.MEDIA_ROOT, str(instance.file))
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            instance = self.get_object()
+            file_path = instance.file.path
             
-            # Delete the database record
-            instance.delete()
+            # Try to delete file with retries
+            max_retries = 3
+            retry_delay = 1  # seconds
             
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            for attempt in range(max_retries):
+                try:
+                    # First try to delete from storage
+                    if os.path.exists(file_path):
+                        default_storage.delete(instance.file.name)
+                    # Then delete the database record
+                    instance.delete()
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+                except PermissionError as e:
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay)
+                        continue
+                    raise e
+                    
         except Exception as e:
-            print(f"Delete error: {str(e)}")
+            logger.error(f"File deletion error: {str(e)}")
             return Response(
-                {'error': 'Failed to delete file'},
+                {"error": "Failed to delete file. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            ) 
+            )
 
     @action(detail=True, methods=['post'])
     def share(self, request, pk=None):

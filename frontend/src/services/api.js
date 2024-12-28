@@ -206,8 +206,15 @@ const base64ToArrayBuffer = (base64) => {
 };
 
 export const deleteFile = async (fileId) => {
-  const response = await api.delete(`/files/${fileId}/`);
-  return response.data;
+  try {
+    await api.delete(`/files/${fileId}/`);
+  } catch (error) {
+    // Check if it's a 500 error due to file being locked
+    if (error.response?.status === 500) {
+      throw new Error('File is currently in use. Please try again in a moment.');
+    }
+    throw new Error('Failed to delete file');
+  }
 };
 
 export const getSharedFiles = async () => {
