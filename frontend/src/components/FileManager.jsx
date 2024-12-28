@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Form, Alert, Modal } from 'react-bootstrap';
 import { uploadFile, downloadFile, getFiles, deleteFile, shareFile } from '../services/api';
+import { encryptFile } from '../utils/encryption';
 import './FileManager.css';
 
 const FileManager = () => {
@@ -11,7 +12,7 @@ const FileManager = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
-  const [sharePermission, setSharePermission] = useState('DOWNLOAD');
+  const [sharePermission, setSharePermission] = useState('VIEW');
 
   useEffect(() => {
     fetchFiles();
@@ -39,8 +40,13 @@ const FileManager = () => {
 
     setLoading(true);
     try {
+      const { encryptedFile, key, iv } = await encryptFile(selectedFile);
+      
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append('file', encryptedFile);
+      formData.append('encryption_key', key);
+      formData.append('encryption_iv', iv);
+      
       await uploadFile(formData);
       await fetchFiles();
       setSelectedFile(null);

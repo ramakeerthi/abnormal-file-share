@@ -4,6 +4,9 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import base64
 import os
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 def generate_key(password, salt):
     """Generate an AES key from password and salt using PBKDF2"""
@@ -16,8 +19,7 @@ def generate_key(password, salt):
     key = kdf.derive(password.encode())
     return key
 
-def encrypt_file(file_data):
-    """Encrypt file data using AES-256"""
+def encrypt_file(data):
     # Generate a random salt
     salt = os.urandom(16)
     # Generate encryption key
@@ -30,23 +32,32 @@ def encrypt_file(file_data):
     encryptor = cipher.encryptor()
     
     # Pad the data
-    padding_length = 16 - (len(file_data) % 16)
-    padded_data = file_data + bytes([padding_length] * padding_length)
+    padding_length = 16 - (len(data) % 16)
+    padded_data = data + bytes([padding_length] * padding_length)
     
     # Encrypt the data
     encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
     
-    # Combine salt, IV, and encrypted data
     return salt + iv + encrypted_data
 
 def decrypt_file(encrypted_data):
-    """Extract encryption parameters and return them with encrypted content"""
+    # Extract salt, iv and encrypted content
     salt = encrypted_data[:16]
     iv = encrypted_data[16:32]
     encrypted_content = encrypted_data[32:]
     
-    return {
-        'salt': base64.b64encode(salt).decode('utf-8'),
-        'iv': base64.b64encode(iv).decode('utf-8'),
-        'content': base64.b64encode(encrypted_content).decode('utf-8')
-    } 
+    # Generate decryption key
+    key = generate_key(settings.FILE_ENCRYPTION_KEY, salt)
+    
+    # Create AES cipher
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
+    decryptor = cipher.decryptor()
+    
+    # Decrypt the data
+    decrypted_data = decryptor.update(encrypted_content) + decryptor.finalize()
+    
+    # Remove padding
+    padding_length = decrypted_data[-1]
+    decrypted_data = decrypted_data[:-padding_length]
+    
+    return decrypted_data 

@@ -15,6 +15,12 @@ from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from django.http import FileResponse
+from django.utils.encoding import smart_str
+import io
+import logging
+from django.core.files.storage import default_storage
+import time
 
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
@@ -103,47 +109,66 @@ class FileViewSet(viewsets.ModelViewSet):
             # Read encrypted file data
             encrypted_data = file.file.read()
             
-            # Get encryption parameters for client-side decryption
-            decryption_data = decrypt_file(encrypted_data)
+            # Get decrypted data
+            decrypted_data = decrypt_file(encrypted_data)
             
-            return Response({
-                'filename': file.original_name,
-                'content_type': file.content_type,
-                'salt': decryption_data['salt'],
-                'iv': decryption_data['iv'],
-                'content': decryption_data['content']
-            })
+            # Create response with decrypted content
+            response = HttpResponse(
+                content=decrypted_data,
+                content_type='application/octet-stream'
+            )
+            
+            # Add headers
+            response['Content-Disposition'] = f'attachment; filename="{file.original_name}"'
+            response['Content-Length'] = len(decrypted_data)
+            response['X-Original-Content-Type'] = file.content_type
+            
+            # Add encryption headers if needed
+            if file.is_client_encrypted:
+                response['X-Encryption-Key'] = file.client_encryption_key
+                response['X-Encryption-IV'] = file.client_encryption_iv
+            
+            return response
             
         except File.DoesNotExist:
             return Response(
                 {"error": "File not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Exception as e:
+            return Response(
+                {"error": "Failed to download file"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if request.user.role != 'ADMIN' and instance.uploaded_by != request.user:
-            return Response(
-                {'error': 'You do not have permission to delete this file'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
         try:
-            # Delete the physical file
-            file_path = os.path.join(settings.MEDIA_ROOT, str(instance.file))
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            instance = self.get_object()
+            file_path = instance.file.path
             
-            # Delete the database record
-            instance.delete()
+            # Try to delete file with retries
+            max_retries = 3
+            retry_delay = 1  # seconds
             
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            for attempt in range(max_retries):
+                try:
+                    # First try to delete from storage
+                    if os.path.exists(file_path):
+                        default_storage.delete(instance.file.name)
+                    # Then delete the database record
+                    instance.delete()
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+                except PermissionError as e:
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay)
+                        continue
+                    raise e
+                    
         except Exception as e:
-            print(f"Delete error: {str(e)}")
             return Response(
-                {'error': 'Failed to delete file'},
+                {"error": "Failed to delete file. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            ) 
+            )
 
     @action(detail=True, methods=['post'])
     def share(self, request, pk=None):
@@ -155,10 +180,6 @@ class FileViewSet(viewsets.ModelViewSet):
             try:
                 user_to_share_with = User.objects.get(email=email)
                 
-                # Add debug logging
-                print(f"File owner: {file.uploaded_by.email}")
-                print(f"User to share with: {user_to_share_with.email}")
-                print(f"Are they the same? {file.uploaded_by == user_to_share_with}")
                 
                 # Don't share if already shared
                 if user_to_share_with in file.shared_with.all():
@@ -194,110 +215,141 @@ class FileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data) 
 
 class FileUploadView(APIView):
-    permission_classes = (IsAuthenticated,)
-    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
         try:
             file_obj = request.FILES['file']
+            encryption_key = request.POST.get('encryption_key')
+            encryption_iv = request.POST.get('encryption_iv')
+
+            # First read the client-encrypted file
             file_data = file_obj.read()
             
-            # Encrypt the file data
+            # Apply server-side encryption
             encrypted_data = encrypt_file(file_data)
-            
-            # Create a new in-memory file with encrypted data
             encrypted_file = ContentFile(encrypted_data)
             
-            file = File(
+            # Create file instance with both client and server encryption info
+            file_instance = File.objects.create(
                 uploaded_by=request.user,
                 original_name=file_obj.name,
                 file_size=file_obj.size,
-                content_type=file_obj.content_type
+                content_type=file_obj.content_type or 'application/octet-stream',
+                client_encryption_key=encryption_key,
+                client_encryption_iv=encryption_iv,
+                is_client_encrypted=bool(encryption_key and encryption_iv)
             )
             
-            # Save encrypted file
-            file.file.save(f"{uuid.uuid4().hex}.enc", encrypted_file)
-            file.save()
+            # Save the server-encrypted file
+            file_instance.file.save(f"{uuid.uuid4().hex}.enc", encrypted_file)
             
-            return Response({
-                'message': 'File uploaded successfully',
-                'file_id': file.id
-            }, status=status.HTTP_201_CREATED)
-            
+            serializer = FileSerializer(file_instance, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({
-                'error': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class SecureFileResponse(HttpResponse):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self['Access-Control-Allow-Origin'] = 'https://localhost:3000'
+        self['Access-Control-Allow-Credentials'] = 'true'
 
 class FileDownloadView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, file_id):
         try:
-            file = File.objects.get(id=file_id)
+            file_obj = File.objects.get(id=file_id)
             
-            # Check if user has access to file
-            has_access = (
-                request.user.role == 'ADMIN' or  # Admin can always download
-                file.uploaded_by == request.user or  # Owner can always download
-                FileShare.objects.filter(  # Check share permissions
-                    file=file, 
-                    user=request.user,
-                    permission='DOWNLOAD'
-                ).exists()
+            # Check permissions
+            has_permission = (
+                request.user.role == 'ADMIN' or 
+                file_obj.uploaded_by == request.user or 
+                FileShare.objects.filter(file=file_obj, user=request.user, permission='DOWNLOAD').exists()
             )
-
-            if not has_access:
+            if not has_permission:
                 return Response(
                     {"error": "You don't have permission to download this file"},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # Check if file exists on disk
-            if not file.file or not os.path.exists(file.file.path):
-                # Remove sharing relationships
-                FileShare.objects.filter(file=file).delete()
-                file.delete()
+            # Read and decrypt server-side encryption
+            try:
+                with file_obj.file.open('rb') as f:
+                    encrypted_data = f.read()
+                
+                decrypted_data = decrypt_file(encrypted_data)
+                
+            except Exception as e:
                 return Response(
-                    {"error": "File no longer exists"},
-                    status=status.HTTP_404_NOT_FOUND
+                    {"error": f"File read/decrypt failed: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            # Read encrypted file data
+            # Create response with server-decrypted data
             try:
-                with file.file.open('rb') as f:
-                    encrypted_data = f.read()
-            except IOError:
-                # Handle case where file can't be read
-                FileShare.objects.filter(file=file).delete()
-                file.delete()
-                return Response(
-                    {"error": "File is corrupted or unavailable"},
-                    status=status.HTTP_404_NOT_FOUND
+                response = HttpResponse(
+                    content=decrypted_data,
+                    content_type='application/octet-stream'
                 )
-            
-            # Get encryption parameters for client-side decryption
-            try:
-                decryption_data = decrypt_file(encrypted_data)
-                return Response({
-                    'filename': file.original_name,
-                    'content_type': file.content_type,
-                    'salt': decryption_data['salt'],
-                    'iv': decryption_data['iv'],
-                    'content': decryption_data['content']
-                })
+                
+                # Set required headers
+                response['Content-Disposition'] = f'attachment; filename="{smart_str(file_obj.original_name)}"'
+                response['Content-Length'] = len(decrypted_data)
+                response['X-Original-Content-Type'] = file_obj.content_type
+                
+                if file_obj.is_client_encrypted:
+                    if file_obj.client_encryption_key is None or file_obj.client_encryption_iv is None:
+                        raise Exception("Client encryption data missing")
+                    response['X-Encryption-Key'] = str(file_obj.client_encryption_key)
+                    response['X-Encryption-IV'] = str(file_obj.client_encryption_iv)
+                
+                # Set CORS headers
+                response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
+                response['Access-Control-Allow-Credentials'] = 'true'
+                response['Access-Control-Expose-Headers'] = ', '.join([
+                    'Content-Disposition',
+                    'Content-Length',
+                    'Content-Type',
+                    'X-Encryption-Key',
+                    'X-Encryption-IV',
+                    'X-Original-Content-Type'
+                ])
+                
+                return response
+                
             except Exception as e:
-                print(f"Decryption error: {str(e)}")
                 return Response(
-                    {"error": "Failed to process file"},
+                    {"error": f"Failed to create response: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
             
         except File.DoesNotExist:
+            return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            import traceback
             return Response(
-                {"error": "File not found"},
-                status=status.HTTP_404_NOT_FOUND
-            ) 
+                {"error": f"Failed to download file: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def options(self, request, *args, **kwargs):
+        response = HttpResponse()
+        response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
+        response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response['Access-Control-Allow-Headers'] = 'Accept, Content-Type, Authorization'
+        response['Access-Control-Allow-Credentials'] = 'true'
+        response['Access-Control-Expose-Headers'] = ', '.join([
+            'Content-Disposition',
+            'Content-Length',
+            'Content-Type',
+            'X-Encryption-Key',
+            'X-Encryption-IV',
+            'X-Original-Content-Type'
+        ])
+        return response
 
 class FileShareView(APIView):
     permission_classes = [IsAuthenticated]

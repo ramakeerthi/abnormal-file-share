@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { decryptFile } from '../utils/encryption';
 
 const API_URL = 'https://localhost:8000';
 
@@ -49,7 +50,6 @@ export const login = async (credentials) => {
     const response = await api.post('/accounts/login/', credentials);
     return response.data;
   } catch (error) {
-    console.error('Login error:', error);
     throw error;
   }
 };
@@ -59,7 +59,6 @@ export const logout = async () => {
     const response = await api.post('/accounts/logout/');
     return response.data;
   } catch (error) {
-    console.error('Logout error:', error);
     throw error;
   }
 };
@@ -109,87 +108,74 @@ export const getFiles = async () => {
 };
 
 export const uploadFile = async (formData) => {
-  const response = await api.post('/files/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+  try {
+    const response = await api.post('/files/upload/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const downloadFile = async (fileId) => {
   try {
-    const response = await api.get(`/files/download/${fileId}/`);
+    const response = await api.get(`/files/${fileId}/download/`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': '*/*'
+      },
+      withCredentials: true
+    });
     
-    if (response.data.error) {
-      throw new Error(response.data.error);
+    // Extract headers (case-insensitive with Axios)
+    const headers = response.headers;
+    const contentType = headers['x-original-content-type'] || 'application/octet-stream';
+    const contentDisposition = headers['content-disposition'];
+    const encryptionKey = headers['x-encryption-key'];
+    const encryptionIv = headers['x-encryption-iv'];
+
+
+    let filename = 'downloaded_file';
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1].replace(/['"]/g, '');
+      }
     }
+
+    let fileData = response.data;
     
-    // Convert base64 strings back to Uint8Arrays
-    const salt = base64ToArrayBuffer(response.data.salt);
-    const iv = base64ToArrayBuffer(response.data.iv);
-    const content = base64ToArrayBuffer(response.data.content);
+    // Handle client-side decryption if needed
+    if (encryptionKey && encryptionIv) {
+      try {
+        const decryptedBlob = await decryptFile(fileData, encryptionKey, encryptionIv);
+        fileData = decryptedBlob;
+      } catch (decryptError) {
+        throw new Error('Failed to decrypt file');
+      }
+    }
+
+    // Create final blob with correct content type
+    const finalBlob = new Blob([fileData], { type: contentType });
     
-    // Generate decryption key
-    const encoder = new TextEncoder();
-    const keyMaterial = await window.crypto.subtle.importKey(
-      'raw',
-      encoder.encode(process.env.REACT_APP_FILE_KEY),
-      { name: 'PBKDF2' },
-      false,
-      ['deriveBits']
-    );
-    
-    // Derive the key using PBKDF2
-    const key = await window.crypto.subtle.deriveBits(
-      {
-        name: 'PBKDF2',
-        salt: salt,
-        iterations: 100000,
-        hash: 'SHA-256'
-      },
-      keyMaterial,
-      256 // 256 bits for AES-256
-    );
-    
-    // Import the derived bits as an AES-CBC key
-    const aesKey = await window.crypto.subtle.importKey(
-      'raw',
-      key,
-      { name: 'AES-CBC' },
-      false,
-      ['decrypt']
-    );
-    
-    // Decrypt the file
-    const decryptedContent = await window.crypto.subtle.decrypt(
-      {
-        name: 'AES-CBC',
-        iv: iv
-      },
-      aesKey,
-      content
-    );
-    
-    // Remove padding
-    const paddingLength = new Uint8Array(decryptedContent)[decryptedContent.byteLength - 1];
-    const unpadded = decryptedContent.slice(0, decryptedContent.byteLength - paddingLength);
-    
-    // Create and download the file
-    const blob = new Blob([unpadded], { type: response.data.content_type });
-    const url = window.URL.createObjectURL(blob);
+    // Create and trigger download
+    const url = window.URL.createObjectURL(finalBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', response.data.filename);
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+
   } catch (error) {
-    if (error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    }
-    console.error('Download error:', error);
     throw error;
   }
 };
@@ -205,8 +191,15 @@ const base64ToArrayBuffer = (base64) => {
 };
 
 export const deleteFile = async (fileId) => {
-  const response = await api.delete(`/files/${fileId}/`);
-  return response.data;
+  try {
+    await api.delete(`/files/${fileId}/`);
+  } catch (error) {
+    // Check if it's a 500 error due to file being locked
+    if (error.response?.status === 500) {
+      throw new Error('File is currently in use. Please try again in a moment.');
+    }
+    throw new Error('Failed to delete file');
+  }
 };
 
 export const getSharedFiles = async () => {
