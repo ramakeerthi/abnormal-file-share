@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django.http import HttpResponse
-from .models import File, FileShare
-from .serializers import FileSerializer, FileShareSerializer
+from .models import File, FileShare, ShareableLink
+from .serializers import FileSerializer, FileShareSerializer, ShareableLinkSerializer
 from .utils import encrypt_file, decrypt_file
+from django.shortcuts import get_object_or_404
 import os
 import uuid
 from django.db import models
@@ -21,6 +22,9 @@ import io
 import logging
 from django.core.files.storage import default_storage
 import time
+from django.utils import timezone
+from datetime import timedelta
+from django.views.decorators.http import require_GET
 
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
@@ -410,3 +414,131 @@ class FileShareView(APIView):
                 {"error": "File not found"}, 
                 status=status.HTTP_404_NOT_FOUND
             ) 
+
+class ShareableLinkView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        # Allow unauthenticated access for GET requests (downloading files)
+        if self.request.method == 'GET':
+            return []
+        # Require authentication for POST requests (creating links)
+        return [IsAuthenticated()]
+    
+    def post(self, request, file_id):
+        try:
+            file = File.objects.get(id=file_id)
+            
+            # Check if user has permission to share
+            if not (request.user == file.uploaded_by or request.user.role == 'ADMIN'):
+                return Response(
+                    {"error": "You don't have permission to share this file"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Validate hours
+            hours = int(request.data.get('hours', 1))
+            if not 1 <= hours <= 24:
+                return Response(
+                    {"error": "Invalid duration. Must be between 1 and 24 hours"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Create shareable link
+            expires_at = timezone.now() + timedelta(hours=hours)
+            link = ShareableLink.objects.create(
+                file=file,
+                created_by=request.user,
+                expires_at=expires_at
+            )
+            
+            serializer = ShareableLinkSerializer(link, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        except File.DoesNotExist:
+            return Response(
+                {"error": "File not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def get(self, request, link_id):
+        try:
+            link = get_object_or_404(ShareableLink, id=link_id)
+            
+            # Check if link has expired
+            if link.expires_at < timezone.now():
+                return Response(
+                    {"error": "This link has expired"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # Get the file
+            file_obj = link.file
+            
+            # Read and decrypt server-side encryption
+            try:
+                with file_obj.file.open('rb') as f:
+                    encrypted_data = f.read()
+                
+                decrypted_data = decrypt_file(encrypted_data)
+                
+            except Exception as e:
+                return Response(
+                    {"error": f"File read/decrypt failed: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Create response with server-decrypted data
+            try:
+                response = HttpResponse(
+                    content=decrypted_data,
+                    content_type='application/octet-stream'
+                )
+                
+                # Set required headers
+                response['Content-Disposition'] = f'attachment; filename="{smart_str(file_obj.original_name)}"'
+                response['Content-Length'] = len(decrypted_data)
+                response['X-Original-Content-Type'] = file_obj.content_type
+                
+                if file_obj.is_client_encrypted:
+                    response['X-Encryption-Key'] = str(file_obj.client_encryption_key)
+                    response['X-Encryption-IV'] = str(file_obj.client_encryption_iv)
+                
+                # Set CORS headers
+                response['Access-Control-Allow-Origin'] = '*'  # Allow any origin for public links
+                response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+                response['Access-Control-Expose-Headers'] = ', '.join([
+                    'Content-Disposition',
+                    'Content-Length',
+                    'Content-Type',
+                    'X-Encryption-Key',
+                    'X-Encryption-IV',
+                    'X-Original-Content-Type'
+                ])
+                
+                return response
+                
+            except Exception as e:
+                return Response(
+                    {"error": f"Failed to create response: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            ) 
+
+@require_GET
+def favicon_view(request):
+    file_path = os.path.join(settings.STATIC_ROOT, 'favicon.ico')
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            return HttpResponse(f.read(), content_type="image/x-icon")
+    return HttpResponse(status=404) 

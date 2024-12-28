@@ -247,4 +247,13 @@ api.interceptors.response.use(
   }
 );
 
+export const createShareableLink = async (fileId, hours) => {
+  try {
+    const response = await api.post(`/files/share-link/${fileId}/`, { hours });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export default api; 

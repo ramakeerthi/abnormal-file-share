@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Alert, Modal, Form } from 'react-bootstrap';
-import { getSharedFiles, downloadFile, deleteFile, shareFile } from '../services/api';
+import { getSharedFiles, downloadFile, deleteFile, shareFile, createShareableLink } from '../services/api';
 import './FileManager.css';
+import { useSelector } from 'react-redux';
 
 const SharedFiles = () => {
+  const { user } = useSelector(state => state.auth);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [shareableLink, setShareableLink] = useState(null);
+  const [linkDuration, setLinkDuration] = useState(1);
 
   useEffect(() => {
     fetchFiles();
@@ -67,6 +72,15 @@ const SharedFiles = () => {
     }
   };
 
+  const handleCreateLink = async () => {
+    try {
+      const response = await createShareableLink(selectedFileId, linkDuration);
+      setShareableLink(response);
+    } catch (error) {
+      setError('Failed to create shareable link');
+    }
+  };
+
   return (
     <Container className="file-manager mt-4">
       <h2 className="file-manager-title">Shared Files</h2>
@@ -101,23 +115,14 @@ const SharedFiles = () => {
                       Download
                     </Button>
                   )}
-                  {file.can_manage && (
-                    <>
-                      <Button
-                        variant="info"
-                        size="sm"
-                        onClick={() => handleShare(file.id)}
-                      >
-                        Share
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDelete(file.id)}
-                      >
-                        Delete
-                      </Button>
-                    </>
+                  {user?.role === 'ADMIN' && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(file.id)}
+                    >
+                      Delete
+                    </Button>
                   )}
                 </div>
               </td>
@@ -151,6 +156,58 @@ const SharedFiles = () => {
           <Button variant="primary" onClick={handleShareSubmit}>
             Share
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showLinkModal} onHide={() => setShowLinkModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Create Shareable Link</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}
+          {shareableLink ? (
+            <div>
+              <p>Link created successfully! Expires in {linkDuration} hours.</p>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  value={shareableLink.url}
+                  readOnly
+                  onClick={(e) => e.target.select()}
+                />
+              </Form.Group>
+            </div>
+          ) : (
+            <Form>
+              <Form.Group>
+                <Form.Label>Link Duration (hours)</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="1"
+                  max="24"
+                  value={linkDuration}
+                  onChange={(e) => setLinkDuration(parseInt(e.target.value))}
+                />
+                <Form.Text className="text-muted">
+                  Choose between 1 and 24 hours
+                </Form.Text>
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => {
+            setShowLinkModal(false);
+            setShareableLink(null);
+            setLinkDuration(1);
+          }}>
+            Close
+          </Button>
+          {!shareableLink && (
+            <Button variant="primary" onClick={handleCreateLink}>
+              Create Link
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
     </Container>

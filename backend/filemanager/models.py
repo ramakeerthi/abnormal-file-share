@@ -46,3 +46,13 @@ class FileShare(models.Model):
 
     class Meta:
         unique_together = ('file', 'user') 
+
+class ShareableLink(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    file = models.ForeignKey(File, on_delete=models.CASCADE, related_name='shareable_links')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    
+    class Meta:
+        ordering = ['-created_at'] 

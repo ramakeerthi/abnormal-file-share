@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import File, FileShare
+from .models import File, FileShare, ShareableLink
 
 class FileShareSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,3 +39,14 @@ class FileSerializer(serializers.ModelSerializer):
     def get_can_manage(self, obj):
         request = self.context.get('request')
         return request.user == obj.uploaded_by or request.user.role == 'ADMIN' 
+
+class ShareableLinkSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ShareableLink
+        fields = ['id', 'url', 'expires_at']
+        
+    def get_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(f'/files/download-link/{obj.id}/') 
