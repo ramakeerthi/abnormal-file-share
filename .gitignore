@@ -50,3 +50,4 @@ backend/media/*
 # Log files
 *.log
 debug.log
+backend/debug.log
