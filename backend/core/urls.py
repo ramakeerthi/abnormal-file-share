@@ -16,6 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.generic.base import RedirectView
+from django.contrib.staticfiles.storage import staticfiles_storage
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -23,4 +27,13 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('files/', include('filemanager.urls')),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(
+        'favicon.ico',
+        RedirectView.as_view(url=staticfiles_storage.url('favicon.ico')),
+        name='favicon'
+    ),
 ]
+
+# Add this for serving static files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

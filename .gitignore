@@ -47,3 +47,7 @@ backend/media/*
 .env.production.local
 
 
+# Log files
+*.log
+logs/
+log/

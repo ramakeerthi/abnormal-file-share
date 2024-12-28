@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Form, Alert, Modal } from 'react-bootstrap';
-import { uploadFile, downloadFile, getFiles, deleteFile, shareFile } from '../services/api';
+import { Container, Table, Button, Form, Alert, Modal, Nav } from 'react-bootstrap';
+import { uploadFile, downloadFile, getFiles, deleteFile, shareFile, createShareableLink } from '../services/api';
 import { encryptFile } from '../utils/encryption';
 import './FileManager.css';
 
@@ -13,6 +13,8 @@ const FileManager = () => {
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [userEmailToShare, setUserEmailToShare] = useState('');
   const [sharePermission, setSharePermission] = useState('VIEW');
+  const [shareableLink, setShareableLink] = useState(null);
+  const [linkDuration, setLinkDuration] = useState(1);
 
   useEffect(() => {
     fetchFiles();
@@ -101,6 +103,15 @@ const FileManager = () => {
     }
   };
 
+  const handleCreateLink = async () => {
+    try {
+      const response = await createShareableLink(selectedFileId, linkDuration);
+      setShareableLink(response);
+    } catch (error) {
+      setError('Failed to create shareable link');
+    }
+  };
+
   return (
     <Container className="file-manager mt-4">
       <h2 className="file-manager-title">File Manager</h2>
@@ -180,35 +191,98 @@ const FileManager = () => {
         </Modal.Header>
         <Modal.Body>
           {error && <Alert variant="danger">{error}</Alert>}
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>User Email</Form.Label>
-              <Form.Control
-                type="email"
-                value={userEmailToShare}
-                onChange={(e) => setUserEmailToShare(e.target.value)}
-                placeholder="Enter user email to share with"
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Permission Level</Form.Label>
-              <Form.Select
-                value={sharePermission}
-                onChange={(e) => setSharePermission(e.target.value)}
+          <Nav variant="tabs" className="mb-3">
+            <Nav.Item>
+              <Nav.Link 
+                active={!shareableLink} 
+                onClick={() => setShareableLink(null)}
               >
-                <option value="VIEW">View Only</option>
-                <option value="DOWNLOAD">View and Download</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
+                Share with User
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link 
+                active={!!shareableLink} 
+                onClick={() => setShareableLink({})}
+              >
+                Create Link
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+
+          {!shareableLink ? (
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>User Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  value={userEmailToShare}
+                  onChange={(e) => setUserEmailToShare(e.target.value)}
+                  placeholder="Enter user email to share with"
+                />
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Permission Level</Form.Label>
+                <Form.Select
+                  value={sharePermission}
+                  onChange={(e) => setSharePermission(e.target.value)}
+                >
+                  <option value="VIEW">View Only</option>
+                  <option value="DOWNLOAD">View and Download</option>
+                </Form.Select>
+              </Form.Group>
+            </Form>
+          ) : (
+            <Form>
+              {shareableLink.url ? (
+                <div>
+                  <p>Link created successfully! Expires in {linkDuration} hours.</p>
+                  <Form.Group>
+                    <Form.Control
+                      type="text"
+                      value={shareableLink.url}
+                      readOnly
+                      onClick={(e) => e.target.select()}
+                    />
+                  </Form.Group>
+                </div>
+              ) : (
+                <Form.Group>
+                  <Form.Label>Link Duration (hours)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="1"
+                    max="24"
+                    value={linkDuration}
+                    onChange={(e) => setLinkDuration(parseInt(e.target.value))}
+                  />
+                  <Form.Text className="text-muted">
+                    Choose between 1 and 24 hours
+                  </Form.Text>
+                </Form.Group>
+              )}
+            </Form>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowShareModal(false)}>
-            Cancel
+          <Button variant="secondary" onClick={() => {
+            setShowShareModal(false);
+            setShareableLink(null);
+            setUserEmailToShare('');
+            setSharePermission('VIEW');
+            setLinkDuration(1);
+          }}>
+            Close
           </Button>
-          <Button variant="primary" onClick={handleShareSubmit}>
-            Share
-          </Button>
+          {!shareableLink ? (
+            <Button variant="primary" onClick={handleShareSubmit}>
+              Share
+            </Button>
+          ) : !shareableLink.url ? (
+            <Button variant="primary" onClick={handleCreateLink}>
+              Create Link
+            </Button>
+          ) : null}
         </Modal.Footer>
       </Modal>
     </Container>
