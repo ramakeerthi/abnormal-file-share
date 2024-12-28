@@ -275,9 +275,6 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
-    'x-encryption-key',
-    'x-encryption-iv',
-    'x-original-content-type',
 ]
 
 CORS_EXPOSE_HEADERS = [

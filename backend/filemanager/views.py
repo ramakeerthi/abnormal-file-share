@@ -232,17 +232,17 @@ class FileUploadView(APIView):
             encryption_key = request.POST.get('encryption_key')
             encryption_iv = request.POST.get('encryption_iv')
             
-            print("\n=== File Upload Started ===")
-            print(f"File name: {file_obj.name}")
-            print(f"File size: {file_obj.size}")
-            print(f"Content type: {file_obj.content_type or 'application/octet-stream'}")
-            print(f"Has encryption key: {bool(encryption_key)}")
-            print(f"Has encryption IV: {bool(encryption_iv)}")
-            
+            logger.info("=== File Upload Started ===")
+            logger.info(f"File name: {file_obj.name}")
+            logger.info(f"File size: {file_obj.size}")
+            logger.info(f"Content type: {file_obj.content_type}")
+            logger.info(f"Has client encryption: {bool(encryption_key and encryption_iv)}")
+
             # First read the client-encrypted file
             file_data = file_obj.read()
             
             # Apply server-side encryption
+            logger.info("Applying server-side encryption")
             encrypted_data = encrypt_file(file_data)
             encrypted_file = ContentFile(encrypted_data)
             
@@ -260,17 +260,14 @@ class FileUploadView(APIView):
             # Save the server-encrypted file
             file_instance.file.save(f"{uuid.uuid4().hex}.enc", encrypted_file)
             
-            print(f"File saved with ID: {file_instance.id}")
-            print(f"Client encryption: {file_instance.is_client_encrypted}")
+            logger.info(f"File saved with ID: {file_instance.id}")
+            logger.info(f"Client encryption: {file_instance.is_client_encrypted}")
             
             serializer = FileSerializer(file_instance, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            print(f"Upload error: {str(e)}")
-            return Response(
-                {'error': str(e)}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            logger.error(f"Upload error: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class SecureFileResponse(HttpResponse):
     def __init__(self, *args, **kwargs):
@@ -284,57 +281,76 @@ class FileDownloadView(APIView):
     def get(self, request, file_id):
         try:
             file_obj = File.objects.get(id=file_id)
-            print("\n=== File Download Started ===")
-            print(f"File ID: {file_id}")
-            print(f"Original name: {file_obj.original_name}")
-            print(f"Content type: {file_obj.content_type}")
-            print(f"Is client encrypted: {file_obj.is_client_encrypted}")
-            print(f"Has encryption key: {bool(file_obj.client_encryption_key)}")
-            print(f"Has encryption IV: {bool(file_obj.client_encryption_iv)}")
+            logger.info(f"Downloading file: {file_obj.id}, client encrypted: {file_obj.is_client_encrypted}")
             
+            # Check permissions
+            if not (request.user.role == 'ADMIN' or 
+                   file_obj.uploaded_by == request.user or 
+                   FileShare.objects.filter(file=file_obj, user=request.user, permission='DOWNLOAD').exists()):
+                return Response(
+                    {"error": "You don't have permission to download this file"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
             # Read and decrypt server-side encryption
             with file_obj.file.open('rb') as f:
                 encrypted_data = f.read()
+            
+            logger.info("Performing server-side decryption")
             decrypted_data = decrypt_file(encrypted_data)
             
-            # Create response
-            response = SecureFileResponse(
+            # Create response with server-decrypted (but still client-encrypted) data
+            response = HttpResponse(
                 content=decrypted_data,
                 content_type='application/octet-stream'
             )
             
-            # Add headers
+            # Set required headers
             response['Content-Disposition'] = f'attachment; filename="{smart_str(file_obj.original_name)}"'
             response['Content-Length'] = len(decrypted_data)
-            response['X-Original-Content-Type'] = file_obj.content_type or 'application/octet-stream'
+            response['X-Original-Content-Type'] = file_obj.content_type
             
-            # Add encryption headers if present
+            # Add client encryption headers if present
             if file_obj.is_client_encrypted:
-                print("Adding client encryption headers")
-                print(f"Key: {file_obj.client_encryption_key}")
-                print(f"IV: {file_obj.client_encryption_iv}")
-                response['X-Encryption-Key'] = file_obj.client_encryption_key
-                response['X-Encryption-IV'] = file_obj.client_encryption_iv
+                logger.info("Setting client encryption headers")
+                response['X-Encryption-Key'] = str(file_obj.client_encryption_key)
+                response['X-Encryption-IV'] = str(file_obj.client_encryption_iv)
+                logger.info("Client encryption headers set")
             
-            print("\nResponse headers:")
-            for header, value in response.items():
-                print(f"{header}: {value}")
+            # Set CORS headers
+            response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
+            response['Access-Control-Allow-Credentials'] = 'true'
+            response['Access-Control-Expose-Headers'] = ', '.join([
+                'Content-Disposition',
+                'Content-Length',
+                'Content-Type',
+                'X-Encryption-Key',
+                'X-Encryption-IV',
+                'X-Original-Content-Type'
+            ])
             
             return response
             
+        except File.DoesNotExist:
+            return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(f"Download error: {str(e)}")
-            return Response(
-                {'error': str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            logger.error(f"Download error: {str(e)}")
+            return Response({"error": "Failed to download file"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def options(self, request, *args, **kwargs):
         response = HttpResponse()
         response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
         response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response['Access-Control-Allow-Headers'] = 'accept, content-type, authorization'
+        response['Access-Control-Allow-Headers'] = 'Accept, Content-Type, Authorization'
         response['Access-Control-Allow-Credentials'] = 'true'
+        response['Access-Control-Expose-Headers'] = ', '.join([
+            'Content-Disposition',
+            'Content-Length',
+            'Content-Type',
+            'X-Encryption-Key',
+            'X-Encryption-IV',
+            'X-Original-Content-Type'
+        ])
         return response
 
 class FileShareView(APIView):

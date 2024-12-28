@@ -110,12 +110,23 @@ export const getFiles = async () => {
 };
 
 export const uploadFile = async (formData) => {
-  const response = await api.post('/files/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+  try {
+    // Log the formData contents for debugging
+    console.log('FormData contents:');
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    const response = await api.post('/files/upload/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
 };
 
 export const downloadFile = async (fileId) => {
@@ -129,19 +140,19 @@ export const downloadFile = async (fileId) => {
       withCredentials: true
     });
 
-    // Get all headers
+    // Log raw headers
+    console.log('Raw headers:', response.headers);
+    
+    // Extract headers (case-insensitive with Axios)
     const headers = response.headers;
-    console.log('All response headers:', headers);
-
-    // Extract headers using lowercase keys (axios normalizes header names)
     const contentType = headers['x-original-content-type'] || 'application/octet-stream';
     const contentDisposition = headers['content-disposition'];
     const encryptionKey = headers['x-encryption-key'];
     const encryptionIv = headers['x-encryption-iv'];
 
-    console.log('Extracted headers:', {
-      contentType,
-      hasEncryption: !!encryptionKey && !!encryptionIv
+    console.log('Encryption info:', {
+      hasClientEncryption: !!encryptionKey && !!encryptionIv,
+      contentType
     });
 
     // Get filename from Content-Disposition
@@ -155,26 +166,24 @@ export const downloadFile = async (fileId) => {
 
     let fileData = response.data;
     
-    // Decrypt if encryption headers are present
+    // Handle client-side decryption if needed
     if (encryptionKey && encryptionIv) {
       console.log('Starting client-side decryption');
-      const decryptedBlob = await decryptFile(fileData, encryptionKey, encryptionIv);
-      fileData = decryptedBlob;
-      console.log('Client decryption complete');
+      try {
+        const decryptedBlob = await decryptFile(fileData, encryptionKey, encryptionIv);
+        fileData = decryptedBlob;
+        console.log('Client decryption complete');
+      } catch (decryptError) {
+        console.error('Client decryption failed:', decryptError);
+        throw new Error('Failed to decrypt file');
+      }
     } else {
-      console.log('No encryption headers found - skipping decryption');
+      console.log('No client encryption detected - skipping client decryption');
     }
 
     // Create final blob with correct content type
-    const finalBlob = new Blob([fileData], { 
-      type: contentType 
-    });
-    console.log('Final blob:', {
-      size: finalBlob.size,
-      type: finalBlob.type,
-      filename
-    });
-
+    const finalBlob = new Blob([fileData], { type: contentType });
+    
     // Create and trigger download
     const url = window.URL.createObjectURL(finalBlob);
     const link = document.createElement('a');
