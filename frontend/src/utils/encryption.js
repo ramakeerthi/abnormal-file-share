@@ -32,13 +32,6 @@ export const importKey = async (keyStr) => {
 // Function to encrypt file
 export const encryptFile = async (file) => {
   try {
-    console.log('\n=== Client Encryption Started ===');
-    console.log('Original file:', {
-      name: file.name,
-      type: file.type || 'application/octet-stream',
-      size: file.size
-    });
-
     const key = await generateEncryptionKey();
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const fileBuffer = await file.arrayBuffer();
@@ -67,7 +60,6 @@ export const encryptFile = async (file) => {
       iv: exportedIv
     };
   } catch (error) {
-    console.error('Client encryption error:', error);
     throw error;
   }
 };
@@ -75,19 +67,9 @@ export const encryptFile = async (file) => {
 // Function to decrypt file
 export const decryptFile = async (encryptedBlob, keyStr, ivStr) => {
   try {
-    console.log('\n=== Client Decryption Started ===');
-    console.log('Encrypted blob:', {
-      size: encryptedBlob.size,
-      type: encryptedBlob.type
-    });
-    console.log('Key length:', keyStr?.length);
-    console.log('IV length:', ivStr?.length);
-
     const key = await importKey(keyStr);
     const iv = Uint8Array.from(atob(ivStr), c => c.charCodeAt(0));
     const encryptedBuffer = await encryptedBlob.arrayBuffer();
-
-    console.log('Encrypted buffer size:', encryptedBuffer.byteLength);
 
     const decryptedContent = await window.crypto.subtle.decrypt(
       {
@@ -98,12 +80,8 @@ export const decryptFile = async (encryptedBlob, keyStr, ivStr) => {
       encryptedBuffer
     );
 
-    console.log('Decrypted content size:', decryptedContent.byteLength);
-    console.log('=== Client Decryption Complete ===\n');
-
     return new Blob([decryptedContent]);
   } catch (error) {
-    console.error('Client decryption error:', error);
     throw error;
   }
 }; 

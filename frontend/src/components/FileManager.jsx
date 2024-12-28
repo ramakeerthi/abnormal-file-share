@@ -40,21 +40,8 @@ const FileManager = () => {
 
     setLoading(true);
     try {
-      console.log('\n=== File Upload Started ===');
-      console.log('Selected file:', {
-        name: selectedFile.name,
-        type: selectedFile.type,
-        size: selectedFile.size
-      });
-
       const { encryptedFile, key, iv } = await encryptFile(selectedFile);
       
-      console.log('Encrypted file:', {
-        name: encryptedFile.name,
-        type: encryptedFile.type,
-        size: encryptedFile.size
-      });
-
       const formData = new FormData();
       formData.append('file', encryptedFile);
       formData.append('encryption_key', key);
@@ -64,10 +51,8 @@ const FileManager = () => {
       await fetchFiles();
       setSelectedFile(null);
       e.target.reset();
-      console.log('=== File Upload Complete ===\n');
     } catch (error) {
       setError('Failed to upload file');
-      console.error('Upload error:', error);
     } finally {
       setLoading(false);
     }

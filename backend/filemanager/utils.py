@@ -20,10 +20,6 @@ def generate_key(password, salt):
     return key
 
 def encrypt_file(data):
-    print("\n=== Server Encryption Started ===")
-    print(f"Input data size: {len(data)}")
-    print(f"First 50 bytes of input: {data[:50]}")
-    
     # Generate a random salt
     salt = os.urandom(16)
     # Generate encryption key
@@ -42,16 +38,9 @@ def encrypt_file(data):
     # Encrypt the data
     encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
     
-    print(f"Encrypted data size: {len(encrypted_data)}")
-    print(f"First 50 bytes of encrypted: {encrypted_data[:50]}")
-    print("=== Server Encryption Complete ===\n")
     return salt + iv + encrypted_data
 
 def decrypt_file(encrypted_data):
-    print("\n=== Server Decryption Started ===")
-    print(f"Input data size: {len(encrypted_data)}")
-    print(f"First 50 bytes of input: {encrypted_data[:50]}")
-    
     # Extract salt, iv and encrypted content
     salt = encrypted_data[:16]
     iv = encrypted_data[16:32]
@@ -70,9 +59,5 @@ def decrypt_file(encrypted_data):
     # Remove padding
     padding_length = decrypted_data[-1]
     decrypted_data = decrypted_data[:-padding_length]
-    
-    print(f"Decrypted data size: {len(decrypted_data)}")
-    print(f"First 50 bytes of decrypted: {decrypted_data[:50]}")
-    print("=== Server Decryption Complete ===\n")
     
     return decrypted_data 

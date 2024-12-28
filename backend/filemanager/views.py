@@ -138,7 +138,6 @@ class FileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print(f"Download error: {str(e)}")
             return Response(
                 {"error": "Failed to download file"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -184,10 +183,6 @@ class FileViewSet(viewsets.ModelViewSet):
             try:
                 user_to_share_with = User.objects.get(email=email)
                 
-                # Add debug logging
-                print(f"File owner: {file.uploaded_by.email}")
-                print(f"User to share with: {user_to_share_with.email}")
-                print(f"Are they the same? {file.uploaded_by == user_to_share_with}")
                 
                 # Don't share if already shared
                 if user_to_share_with in file.shared_with.all():
