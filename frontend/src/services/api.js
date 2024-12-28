@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { decryptFile } from '../utils/encryption';
 
 const API_URL = 'https://localhost:8000';
 
@@ -119,76 +120,76 @@ export const uploadFile = async (formData) => {
 
 export const downloadFile = async (fileId) => {
   try {
-    const response = await api.get(`/files/download/${fileId}/`);
-    
-    if (response.data.error) {
-      throw new Error(response.data.error);
+    console.log('\n=== File Download Started ===');
+    const response = await api.get(`/files/${fileId}/download/`, {
+      responseType: 'blob',
+      headers: {
+        'Accept': '*/*'
+      },
+      withCredentials: true
+    });
+
+    // Get all headers
+    const headers = response.headers;
+    console.log('All response headers:', headers);
+
+    // Extract headers using lowercase keys (axios normalizes header names)
+    const contentType = headers['x-original-content-type'] || 'application/octet-stream';
+    const contentDisposition = headers['content-disposition'];
+    const encryptionKey = headers['x-encryption-key'];
+    const encryptionIv = headers['x-encryption-iv'];
+
+    console.log('Extracted headers:', {
+      contentType,
+      hasEncryption: !!encryptionKey && !!encryptionIv
+    });
+
+    // Get filename from Content-Disposition
+    let filename = 'downloaded_file';
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1].replace(/['"]/g, '');
+      }
     }
+
+    let fileData = response.data;
     
-    // Convert base64 strings back to Uint8Arrays
-    const salt = base64ToArrayBuffer(response.data.salt);
-    const iv = base64ToArrayBuffer(response.data.iv);
-    const content = base64ToArrayBuffer(response.data.content);
-    
-    // Generate decryption key
-    const encoder = new TextEncoder();
-    const keyMaterial = await window.crypto.subtle.importKey(
-      'raw',
-      encoder.encode(process.env.REACT_APP_FILE_KEY),
-      { name: 'PBKDF2' },
-      false,
-      ['deriveBits']
-    );
-    
-    // Derive the key using PBKDF2
-    const key = await window.crypto.subtle.deriveBits(
-      {
-        name: 'PBKDF2',
-        salt: salt,
-        iterations: 100000,
-        hash: 'SHA-256'
-      },
-      keyMaterial,
-      256 // 256 bits for AES-256
-    );
-    
-    // Import the derived bits as an AES-CBC key
-    const aesKey = await window.crypto.subtle.importKey(
-      'raw',
-      key,
-      { name: 'AES-CBC' },
-      false,
-      ['decrypt']
-    );
-    
-    // Decrypt the file
-    const decryptedContent = await window.crypto.subtle.decrypt(
-      {
-        name: 'AES-CBC',
-        iv: iv
-      },
-      aesKey,
-      content
-    );
-    
-    // Remove padding
-    const paddingLength = new Uint8Array(decryptedContent)[decryptedContent.byteLength - 1];
-    const unpadded = decryptedContent.slice(0, decryptedContent.byteLength - paddingLength);
-    
-    // Create and download the file
-    const blob = new Blob([unpadded], { type: response.data.content_type });
-    const url = window.URL.createObjectURL(blob);
+    // Decrypt if encryption headers are present
+    if (encryptionKey && encryptionIv) {
+      console.log('Starting client-side decryption');
+      const decryptedBlob = await decryptFile(fileData, encryptionKey, encryptionIv);
+      fileData = decryptedBlob;
+      console.log('Client decryption complete');
+    } else {
+      console.log('No encryption headers found - skipping decryption');
+    }
+
+    // Create final blob with correct content type
+    const finalBlob = new Blob([fileData], { 
+      type: contentType 
+    });
+    console.log('Final blob:', {
+      size: finalBlob.size,
+      type: finalBlob.type,
+      filename
+    });
+
+    // Create and trigger download
+    const url = window.URL.createObjectURL(finalBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', response.data.filename);
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+
   } catch (error) {
-    if (error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    }
     console.error('Download error:', error);
     throw error;
   }

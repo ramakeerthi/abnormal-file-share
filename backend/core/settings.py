@@ -189,7 +189,33 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_EXPOSE_HEADERS = [
+    'content-disposition',
+    'content-length',
+    'content-type',
+    'x-encryption-key',
+    'x-encryption-iv',
+    'x-original-content-type',
+]
 
 # If you're using channels/websockets, configure them for SSL
 CHANNEL_LAYERS = {
@@ -238,3 +264,27 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_NAME = 'csrftoken'
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-encryption-key',
+    'x-encryption-iv',
+    'x-original-content-type',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-disposition',
+    'content-length',
+    'content-type',
+    'x-encryption-key',
+    'x-encryption-iv',
+    'x-original-content-type',
+]

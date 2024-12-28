@@ -15,6 +15,9 @@ class File(models.Model):
     file_size = models.BigIntegerField()
     original_name = models.CharField(max_length=255)
     content_type = models.CharField(max_length=100)
+    client_encryption_key = models.TextField(null=True, blank=True)
+    client_encryption_iv = models.TextField(null=True, blank=True)
+    is_client_encrypted = models.BooleanField(default=False)
     
     class Meta:
         ordering = ['-uploaded_at']
