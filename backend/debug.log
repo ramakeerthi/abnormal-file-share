@@ -1,0 +1,442 @@
+[DEBUG] 2024-12-28 22:07:52,804 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:07:52,804 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:07:52,809 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:07:52,809 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:12,483 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:12,483 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:12,486 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:12,486 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:27,177 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:27,177 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:27,181 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:27,181 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:41,698 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:41,698 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:41,703 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:41,703 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:45,411 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:45,411 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:08:45,415 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:45,415 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:08:51,210 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:08:51,210 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:08:51,215 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'a10fa78be91d4b6a8b346ccdc6f295af' LIMIT 21; args=('a10fa78be91d4b6a8b346ccdc6f295af',); alias=default
+[DEBUG] 2024-12-28 22:08:51,215 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'a10fa78be91d4b6a8b346ccdc6f295af' LIMIT 21; args=('a10fa78be91d4b6a8b346ccdc6f295af',); alias=default
+[DEBUG] 2024-12-28 22:08:51,218 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+[DEBUG] 2024-12-28 22:08:51,218 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+[ERROR] 2024-12-28 22:08:51,219 log Internal Server Error: /files/a10fa78b-e91d-4b6a-8b34-6ccdc6f295af/download/
+[ERROR] 2024-12-28 22:08:51,219 log Internal Server Error: /files/a10fa78b-e91d-4b6a-8b34-6ccdc6f295af/download/
+[DEBUG] 2024-12-28 22:09:05,091 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:09:05,091 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:09:05,095 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:09:05,095 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:10:49,521 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:10:49,521 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:10:49,533 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:10:49,533 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:10:56,402 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:10:56,402 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:10:56,405 views Download view accessed
+[DEBUG] 2024-12-28 22:10:56,405 views Download view accessed
+[INFO] 2024-12-28 22:10:56,406 views Download view accessed
+[INFO] 2024-12-28 22:10:56,406 views Download view accessed
+[WARNING] 2024-12-28 22:10:56,408 views Download view accessed
+[WARNING] 2024-12-28 22:10:56,408 views Download view accessed
+[ERROR] 2024-12-28 22:10:56,409 views Download view accessed
+[ERROR] 2024-12-28 22:10:56,409 views Download view accessed
+[INFO] 2024-12-28 22:10:56,410 views Starting download process for file_id: a10fa78b-e91d-4b6a-8b34-6ccdc6f295af
+[INFO] 2024-12-28 22:10:56,410 views Starting download process for file_id: a10fa78b-e91d-4b6a-8b34-6ccdc6f295af
+[DEBUG] 2024-12-28 22:10:56,411 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'a10fa78be91d4b6a8b346ccdc6f295af' LIMIT 21; args=('a10fa78be91d4b6a8b346ccdc6f295af',); alias=default
+[DEBUG] 2024-12-28 22:10:56,411 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'a10fa78be91d4b6a8b346ccdc6f295af' LIMIT 21; args=('a10fa78be91d4b6a8b346ccdc6f295af',); alias=default
+[INFO] 2024-12-28 22:10:56,414 views File found: a10fa78b-e91d-4b6a-8b34-6ccdc6f295af, client encrypted: True
+[INFO] 2024-12-28 22:10:56,414 views File found: a10fa78b-e91d-4b6a-8b34-6ccdc6f295af, client encrypted: True
+[DEBUG] 2024-12-28 22:10:56,415 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+[DEBUG] 2024-12-28 22:10:56,415 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+[DEBUG] 2024-12-28 22:10:56,417 utils (0.000) SELECT 1 AS "a" FROM "filemanager_fileshare" WHERE ("filemanager_fileshare"."file_id" = 'a10fa78be91d4b6a8b346ccdc6f295af' AND "filemanager_fileshare"."permission" = 'DOWNLOAD' AND "filemanager_fileshare"."user_id" = 2) LIMIT 1; args=(1, 'a10fa78be91d4b6a8b346ccdc6f295af', 'DOWNLOAD', 2); alias=default
+[DEBUG] 2024-12-28 22:10:56,417 utils (0.000) SELECT 1 AS "a" FROM "filemanager_fileshare" WHERE ("filemanager_fileshare"."file_id" = 'a10fa78be91d4b6a8b346ccdc6f295af' AND "filemanager_fileshare"."permission" = 'DOWNLOAD' AND "filemanager_fileshare"."user_id" = 2) LIMIT 1; args=(1, 'a10fa78be91d4b6a8b346ccdc6f295af', 'DOWNLOAD', 2); alias=default
+[INFO] 2024-12-28 22:10:56,418 views User 2 has download permission: True
+[INFO] 2024-12-28 22:10:56,418 views User 2 has download permission: True
+[INFO] 2024-12-28 22:10:56,529 views Creating response with decrypted data...
+[INFO] 2024-12-28 22:10:56,529 views Creating response with decrypted data...
+[INFO] 2024-12-28 22:10:56,530 views Setting client encryption headers...
+[INFO] 2024-12-28 22:10:56,530 views Setting client encryption headers...
+[INFO] 2024-12-28 22:10:56,531 views Client encryption headers set successfully
+[INFO] 2024-12-28 22:10:56,531 views Client encryption headers set successfully
+[INFO] 2024-12-28 22:10:56,531 views Response created successfully
+[INFO] 2024-12-28 22:10:56,531 views Response created successfully
+[DEBUG] 2024-12-28 22:11:03,777 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:03,777 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:03,780 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:03,780 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:03,793 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:03,793 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,421 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,421 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,425 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,425 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,431 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:04,431 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:05,108 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:05,108 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:05,110 views Download view accessed
+[DEBUG] 2024-12-28 22:11:05,110 views Download view accessed
+[INFO] 2024-12-28 22:11:05,112 views Download view accessed
+[INFO] 2024-12-28 22:11:05,112 views Download view accessed
+[WARNING] 2024-12-28 22:11:05,112 views Download view accessed
+[WARNING] 2024-12-28 22:11:05,112 views Download view accessed
+[ERROR] 2024-12-28 22:11:05,113 views Download view accessed
+[ERROR] 2024-12-28 22:11:05,113 views Download view accessed
+[INFO] 2024-12-28 22:11:05,114 views Starting download process for file_id: fad17bb5-283b-4e4a-a8a7-03872583a27a
+[INFO] 2024-12-28 22:11:05,114 views Starting download process for file_id: fad17bb5-283b-4e4a-a8a7-03872583a27a
+[DEBUG] 2024-12-28 22:11:05,116 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'fad17bb5283b4e4aa8a703872583a27a' LIMIT 21; args=('fad17bb5283b4e4aa8a703872583a27a',); alias=default
+[DEBUG] 2024-12-28 22:11:05,116 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."id" = 'fad17bb5283b4e4aa8a703872583a27a' LIMIT 21; args=('fad17bb5283b4e4aa8a703872583a27a',); alias=default
+[INFO] 2024-12-28 22:11:05,120 views File found: fad17bb5-283b-4e4a-a8a7-03872583a27a, client encrypted: False
+[INFO] 2024-12-28 22:11:05,120 views File found: fad17bb5-283b-4e4a-a8a7-03872583a27a, client encrypted: False
+[DEBUG] 2024-12-28 22:11:05,122 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:11:05,122 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[INFO] 2024-12-28 22:11:05,123 views User 2 has download permission: True
+[INFO] 2024-12-28 22:11:05,123 views User 2 has download permission: True
+[INFO] 2024-12-28 22:11:05,196 views Creating response with decrypted data...
+[INFO] 2024-12-28 22:11:05,196 views Creating response with decrypted data...
+[INFO] 2024-12-28 22:11:05,197 views Response created successfully
+[INFO] 2024-12-28 22:11:05,197 views Response created successfully
+[DEBUG] 2024-12-28 22:13:18,580 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,580 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,587 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,587 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,591 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,591 utils (0.000) SELECT "filemanager_file"."id", "filemanager_file"."name", "filemanager_file"."file", "filemanager_file"."uploaded_by_id", "filemanager_file"."uploaded_at", "filemanager_file"."file_size", "filemanager_file"."original_name", "filemanager_file"."content_type", "filemanager_file"."client_encryption_key", "filemanager_file"."client_encryption_iv", "filemanager_file"."is_client_encrypted" FROM "filemanager_file" WHERE "filemanager_file"."uploaded_by_id" = 2 ORDER BY "filemanager_file"."uploaded_at" DESC; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,595 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:18,595 utils (0.000) SELECT "accounts_user"."id", "accounts_user"."password", "accounts_user"."last_login", "accounts_user"."is_superuser", "accounts_user"."first_name", "accounts_user"."last_name", "accounts_user"."is_staff", "accounts_user"."is_active", "accounts_user"."date_joined", "accounts_user"."email", "accounts_user"."role", "accounts_user"."totp_secret" FROM "accounts_user" WHERE "accounts_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+[DEBUG] 2024-12-28 22:13:38,274 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:38,274 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:38,279 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:38,279 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:44,073 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:44,073 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:44,076 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:44,076 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:47,846 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:47,846 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:47,852 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:47,852 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:55,643 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:55,643 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:13:55,647 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:13:55,647 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:14:00,361 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:14:00,361 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:14:00,365 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:14:00,365 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:14:48,712 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:14:48,712 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:14:48,717 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:14:48,717 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:04,314 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:04,314 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:04,319 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:04,319 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:08,017 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:08,017 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:08,021 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:08,021 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:14,929 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:14,929 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:14,934 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:14,934 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:17,557 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:17,557 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:17,560 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:17,560 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:20,220 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:20,220 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:20,224 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:20,224 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:22,840 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:22,840 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:22,845 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:22,845 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:27,625 utils (0.016) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:27,625 utils (0.016) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:27,629 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:27,629 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:31,206 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:31,206 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:31,210 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:31,210 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:37,937 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:37,937 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:37,941 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:37,941 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:42,514 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:42,514 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:42,520 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:42,520 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:52,766 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:52,766 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:52,771 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:52,771 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:57,545 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:57,545 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:15:57,550 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:15:57,550 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:00,038 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:00,038 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:00,043 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:00,043 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:03,708 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:03,708 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:03,711 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:03,711 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:22,136 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:22,136 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:22,140 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:22,140 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:27,900 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:27,900 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:27,905 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:27,905 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:31,616 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:31,616 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:31,623 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:31,623 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:35,319 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:35,319 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:35,323 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:35,323 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:39,999 utils (0.016) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:39,999 utils (0.016) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:40,004 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:40,004 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:42,658 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:42,658 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:42,662 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:42,662 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:50,533 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:50,533 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:50,537 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:50,537 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:53,182 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:53,182 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:53,188 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:53,188 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:56,722 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:56,722 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+[DEBUG] 2024-12-28 22:16:56,726 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+[DEBUG] 2024-12-28 22:16:56,726 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default

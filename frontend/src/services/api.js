@@ -50,7 +50,6 @@ export const login = async (credentials) => {
     const response = await api.post('/accounts/login/', credentials);
     return response.data;
   } catch (error) {
-    console.error('Login error:', error);
     throw error;
   }
 };
@@ -60,7 +59,6 @@ export const logout = async () => {
     const response = await api.post('/accounts/logout/');
     return response.data;
   } catch (error) {
-    console.error('Logout error:', error);
     throw error;
   }
 };
@@ -111,12 +109,6 @@ export const getFiles = async () => {
 
 export const uploadFile = async (formData) => {
   try {
-    // Log the formData contents for debugging
-    console.log('FormData contents:');
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-
     const response = await api.post('/files/upload/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -124,14 +116,12 @@ export const uploadFile = async (formData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Upload error:', error);
     throw error;
   }
 };
 
 export const downloadFile = async (fileId) => {
   try {
-    console.log('\n=== File Download Started ===');
     const response = await api.get(`/files/${fileId}/download/`, {
       responseType: 'blob',
       headers: {
@@ -139,9 +129,6 @@ export const downloadFile = async (fileId) => {
       },
       withCredentials: true
     });
-
-    // Log raw headers
-    console.log('Raw headers:', response.headers);
     
     // Extract headers (case-insensitive with Axios)
     const headers = response.headers;
@@ -150,12 +137,7 @@ export const downloadFile = async (fileId) => {
     const encryptionKey = headers['x-encryption-key'];
     const encryptionIv = headers['x-encryption-iv'];
 
-    console.log('Encryption info:', {
-      hasClientEncryption: !!encryptionKey && !!encryptionIv,
-      contentType
-    });
 
-    // Get filename from Content-Disposition
     let filename = 'downloaded_file';
     if (contentDisposition) {
       const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -168,17 +150,12 @@ export const downloadFile = async (fileId) => {
     
     // Handle client-side decryption if needed
     if (encryptionKey && encryptionIv) {
-      console.log('Starting client-side decryption');
       try {
         const decryptedBlob = await decryptFile(fileData, encryptionKey, encryptionIv);
         fileData = decryptedBlob;
-        console.log('Client decryption complete');
       } catch (decryptError) {
-        console.error('Client decryption failed:', decryptError);
         throw new Error('Failed to decrypt file');
       }
-    } else {
-      console.log('No client encryption detected - skipping client decryption');
     }
 
     // Create final blob with correct content type
@@ -199,7 +176,6 @@ export const downloadFile = async (fileId) => {
     }, 100);
 
   } catch (error) {
-    console.error('Download error:', error);
     throw error;
   }
 };

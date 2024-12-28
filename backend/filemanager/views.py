@@ -22,8 +22,6 @@ import logging
 from django.core.files.storage import default_storage
 import time
 
-logger = logging.getLogger(__name__)
-
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
     permission_classes = [IsAuthenticated]
@@ -167,7 +165,6 @@ class FileViewSet(viewsets.ModelViewSet):
                     raise e
                     
         except Exception as e:
-            logger.error(f"File deletion error: {str(e)}")
             return Response(
                 {"error": "Failed to delete file. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -226,18 +223,11 @@ class FileUploadView(APIView):
             file_obj = request.FILES['file']
             encryption_key = request.POST.get('encryption_key')
             encryption_iv = request.POST.get('encryption_iv')
-            
-            logger.info("=== File Upload Started ===")
-            logger.info(f"File name: {file_obj.name}")
-            logger.info(f"File size: {file_obj.size}")
-            logger.info(f"Content type: {file_obj.content_type}")
-            logger.info(f"Has client encryption: {bool(encryption_key and encryption_iv)}")
 
             # First read the client-encrypted file
             file_data = file_obj.read()
             
             # Apply server-side encryption
-            logger.info("Applying server-side encryption")
             encrypted_data = encrypt_file(file_data)
             encrypted_file = ContentFile(encrypted_data)
             
@@ -255,13 +245,9 @@ class FileUploadView(APIView):
             # Save the server-encrypted file
             file_instance.file.save(f"{uuid.uuid4().hex}.enc", encrypted_file)
             
-            logger.info(f"File saved with ID: {file_instance.id}")
-            logger.info(f"Client encryption: {file_instance.is_client_encrypted}")
-            
             serializer = FileSerializer(file_instance, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            logger.error(f"Upload error: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class SecureFileResponse(HttpResponse):
@@ -276,61 +262,78 @@ class FileDownloadView(APIView):
     def get(self, request, file_id):
         try:
             file_obj = File.objects.get(id=file_id)
-            logger.info(f"Downloading file: {file_obj.id}, client encrypted: {file_obj.is_client_encrypted}")
             
             # Check permissions
-            if not (request.user.role == 'ADMIN' or 
-                   file_obj.uploaded_by == request.user or 
-                   FileShare.objects.filter(file=file_obj, user=request.user, permission='DOWNLOAD').exists()):
+            has_permission = (
+                request.user.role == 'ADMIN' or 
+                file_obj.uploaded_by == request.user or 
+                FileShare.objects.filter(file=file_obj, user=request.user, permission='DOWNLOAD').exists()
+            )
+            if not has_permission:
                 return Response(
                     {"error": "You don't have permission to download this file"},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
             # Read and decrypt server-side encryption
-            with file_obj.file.open('rb') as f:
-                encrypted_data = f.read()
-            
-            logger.info("Performing server-side decryption")
-            decrypted_data = decrypt_file(encrypted_data)
-            
-            # Create response with server-decrypted (but still client-encrypted) data
-            response = HttpResponse(
-                content=decrypted_data,
-                content_type='application/octet-stream'
-            )
-            
-            # Set required headers
-            response['Content-Disposition'] = f'attachment; filename="{smart_str(file_obj.original_name)}"'
-            response['Content-Length'] = len(decrypted_data)
-            response['X-Original-Content-Type'] = file_obj.content_type
-            
-            # Add client encryption headers if present
-            if file_obj.is_client_encrypted:
-                logger.info("Setting client encryption headers")
-                response['X-Encryption-Key'] = str(file_obj.client_encryption_key)
-                response['X-Encryption-IV'] = str(file_obj.client_encryption_iv)
-                logger.info("Client encryption headers set")
-            
-            # Set CORS headers
-            response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
-            response['Access-Control-Allow-Credentials'] = 'true'
-            response['Access-Control-Expose-Headers'] = ', '.join([
-                'Content-Disposition',
-                'Content-Length',
-                'Content-Type',
-                'X-Encryption-Key',
-                'X-Encryption-IV',
-                'X-Original-Content-Type'
-            ])
-            
-            return response
+            try:
+                with file_obj.file.open('rb') as f:
+                    encrypted_data = f.read()
+                
+                decrypted_data = decrypt_file(encrypted_data)
+                
+            except Exception as e:
+                return Response(
+                    {"error": f"File read/decrypt failed: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Create response with server-decrypted data
+            try:
+                response = HttpResponse(
+                    content=decrypted_data,
+                    content_type='application/octet-stream'
+                )
+                
+                # Set required headers
+                response['Content-Disposition'] = f'attachment; filename="{smart_str(file_obj.original_name)}"'
+                response['Content-Length'] = len(decrypted_data)
+                response['X-Original-Content-Type'] = file_obj.content_type
+                
+                if file_obj.is_client_encrypted:
+                    if file_obj.client_encryption_key is None or file_obj.client_encryption_iv is None:
+                        raise Exception("Client encryption data missing")
+                    response['X-Encryption-Key'] = str(file_obj.client_encryption_key)
+                    response['X-Encryption-IV'] = str(file_obj.client_encryption_iv)
+                
+                # Set CORS headers
+                response['Access-Control-Allow-Origin'] = 'https://localhost:3000'
+                response['Access-Control-Allow-Credentials'] = 'true'
+                response['Access-Control-Expose-Headers'] = ', '.join([
+                    'Content-Disposition',
+                    'Content-Length',
+                    'Content-Type',
+                    'X-Encryption-Key',
+                    'X-Encryption-IV',
+                    'X-Original-Content-Type'
+                ])
+                
+                return response
+                
+            except Exception as e:
+                return Response(
+                    {"error": f"Failed to create response: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
             
         except File.DoesNotExist:
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            logger.error(f"Download error: {str(e)}")
-            return Response({"error": "Failed to download file"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            import traceback
+            return Response(
+                {"error": f"Failed to download file: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def options(self, request, *args, **kwargs):
         response = HttpResponse()
