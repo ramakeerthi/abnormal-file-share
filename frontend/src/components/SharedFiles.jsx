@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Alert, Modal, Form } from 'react-bootstrap';
-import { getSharedFiles, downloadFile, deleteFile, shareFile, createShareableLink } from '../services/api';
+import { Container, Table, Button, Alert } from 'react-bootstrap';
+import { getSharedFiles, downloadFile, deleteFile } from '../services/api';
 import './FileManager.css';
 import { useSelector } from 'react-redux';
 
@@ -8,12 +8,6 @@ const SharedFiles = () => {
   const { user } = useSelector(state => state.auth);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [selectedFileId, setSelectedFileId] = useState(null);
-  const [userEmailToShare, setUserEmailToShare] = useState('');
-  const [showLinkModal, setShowLinkModal] = useState(false);
-  const [shareableLink, setShareableLink] = useState(null);
-  const [linkDuration, setLinkDuration] = useState(1);
 
   useEffect(() => {
     fetchFiles();
@@ -49,30 +43,6 @@ const SharedFiles = () => {
       } catch (error) {
         setError('Failed to delete file');
       }
-    }
-  };
-
-  const handleShareSubmit = async () => {
-    try {
-      await shareFile(selectedFileId, userEmailToShare);
-      setShowShareModal(false);
-      setUserEmailToShare('');
-      setError('');
-    } catch (error) {
-      if (error.response?.data?.error) {
-        setError(error.response.data.error);
-      } else {
-        setError('Failed to share file');
-      }
-    }
-  };
-
-  const handleCreateLink = async () => {
-    try {
-      const response = await createShareableLink(selectedFileId, linkDuration);
-      setShareableLink(response);
-    } catch (error) {
-      setError('Failed to create shareable link');
     }
   };
 
@@ -125,86 +95,6 @@ const SharedFiles = () => {
           ))}
         </tbody>
       </Table>
-
-      <Modal show={showShareModal} onHide={() => setShowShareModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Share File</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form>
-            <Form.Group>
-              <Form.Label>User Email</Form.Label>
-              <Form.Control
-                type="email"
-                value={userEmailToShare}
-                onChange={(e) => setUserEmailToShare(e.target.value)}
-                placeholder="Enter user email to share with"
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowShareModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleShareSubmit}>
-            Share
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showLinkModal} onHide={() => setShowLinkModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Create Shareable Link</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
-          {shareableLink ? (
-            <div>
-              <p>Link created successfully! Expires in {linkDuration} hours.</p>
-              <Form.Group>
-                <Form.Control
-                  type="text"
-                  value={shareableLink.url}
-                  readOnly
-                  onClick={(e) => e.target.select()}
-                />
-              </Form.Group>
-            </div>
-          ) : (
-            <Form>
-              <Form.Group>
-                <Form.Label>Link Duration (hours)</Form.Label>
-                <Form.Control
-                  type="number"
-                  min="1"
-                  max="24"
-                  value={linkDuration}
-                  onChange={(e) => setLinkDuration(parseInt(e.target.value))}
-                />
-                <Form.Text className="text-muted">
-                  Choose between 1 and 24 hours
-                </Form.Text>
-              </Form.Group>
-            </Form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => {
-            setShowLinkModal(false);
-            setShareableLink(null);
-            setLinkDuration(1);
-          }}>
-            Close
-          </Button>
-          {!shareableLink && (
-            <Button variant="primary" onClick={handleCreateLink}>
-              Create Link
-            </Button>
-          )}
-        </Modal.Footer>
-      </Modal>
     </Container>
   );
 };
