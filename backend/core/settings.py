@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -185,7 +186,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
-    'AUTH_COOKIE_SAMESITE': 'Strict',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -325,3 +326,13 @@ LOGGING = {
         },
     },
 }
+
+# Disable SSL/HTTPS for tests
+if 'test' in sys.argv:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media_test')
