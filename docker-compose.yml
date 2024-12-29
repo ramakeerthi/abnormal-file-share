@@ -1,44 +1,30 @@
+version: '3.8'
+
 services:
   backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     volumes:
       - ./backend:/app
-      - backend_static:/app/static
-      - backend_media:/app/media
+      - certificates:/app/certificates
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=False
+      - DEBUG=True
       - FILE_ENCRYPTION_KEY=cGZ/wm8jB2S6Fw19UuawMEnU7Unpt40a93EwkldlmaE=
+      - SECRET_KEY=django-insecure-your-secret-key-here
       - DJANGO_SETTINGS_MODULE=core.settings
-      - SECRET_KEY=cGZ/wm8jB2S6Fw19UuawMEnU7Unpt40a93EwkldlmaE=
-    networks:
-      - app-network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    build: ./frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules
-      - ./backend:/backend
+      - certificates:/app/certificates
     ports:
       - "3000:3000"
     environment:
       - REACT_APP_API_URL=https://localhost:8000
-      - HTTPS=true
     depends_on:
       - backend
-    networks:
-      - app-network
 
 volumes:
-  backend_static:
-  backend_media:
-
-networks:
-  app-network:
-    driver: bridge 
+  certificates: 
