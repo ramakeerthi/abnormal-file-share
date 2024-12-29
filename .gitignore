@@ -1,43 +1,6 @@
-# Backend
-*.pyc
-__pycache__/
-db.sqlite3
-.env
-.venv
-venv/
-ENV/
-
-# Frontend
-frontend/node_modules
-frontend/.pnp
-frontend/.pnp.js
-frontend/coverage
-frontend/build
-frontend/.DS_Store
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-
-# IDE
-.vscode/
-.idea/
-
-# SSL Certificates
-certificates/
-*.crt
-*.key
-*.pem
-
-# Media files
-media/
-*/media/
-backend/media/
-backend/media/encrypted_files/
-backend/media/*
+# Docker
+.docker/
+docker-compose.override.yml
 
 # Environment variables
 .env
@@ -46,8 +9,35 @@ backend/media/*
 .env.test.local
 .env.production.local
 
+# Media and static files
+media/
+static/
+staticfiles/
 
-# Log files
+# Node modules
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env/
+.venv/
+
+# Database
+db.sqlite3
+
+# Logs
 *.log
-logs/
-log/
+
+# Certificates
+backend/certificates/*
+!backend/certificates/.gitkeep
+
+# Certificates
+/certificates/*
+!/certificates/.gitkeep

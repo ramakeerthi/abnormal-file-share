@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { decryptFile } from '../utils/encryption';
 
-const API_URL = 'https://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:8000';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -178,16 +178,6 @@ export const downloadFile = async (fileId) => {
   } catch (error) {
     throw error;
   }
-};
-
-// Helper function to convert base64 to ArrayBuffer
-const base64ToArrayBuffer = (base64) => {
-  const binaryString = window.atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
 };
 
 export const deleteFile = async (fileId) => {

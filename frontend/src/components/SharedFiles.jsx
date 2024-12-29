@@ -52,11 +52,6 @@ const SharedFiles = () => {
     }
   };
 
-  const handleShare = async (fileId) => {
-    setSelectedFileId(fileId);
-    setShowShareModal(true);
-  };
-
   const handleShareSubmit = async () => {
     try {
       await shareFile(selectedFileId, userEmailToShare);
