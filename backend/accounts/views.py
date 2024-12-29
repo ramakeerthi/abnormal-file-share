@@ -296,14 +296,18 @@ class UserManagementView(APIView):
         if not user_id or not new_role:
             return Response(
                 {"error": "User ID and role are required"}, 
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
+                headers={'Access-Control-Allow-Origin': 'https://localhost:3000',
+                        'Access-Control-Allow-Credentials': 'true'}
             )
         
         # Add validation
         if new_role not in ['ADMIN', 'USER', 'GUEST']:
             return Response(
                 {"error": "Invalid role specified"}, 
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
+                headers={'Access-Control-Allow-Origin': 'https://localhost:3000',
+                        'Access-Control-Allow-Credentials': 'true'}
             )
         
         try:
@@ -311,7 +315,9 @@ class UserManagementView(APIView):
             if user == request.user:
                 return Response(
                     {"error": "Cannot modify your own role"}, 
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
+                    headers={'Access-Control-Allow-Origin': 'https://localhost:3000',
+                            'Access-Control-Allow-Credentials': 'true'}
                 )
             
             user.role = new_role
@@ -325,9 +331,12 @@ class UserManagementView(APIView):
                 'id': user.id,
                 'email': user.email,
                 'role': user.role
-            })
+            }, headers={'Access-Control-Allow-Origin': 'https://localhost:3000',
+                       'Access-Control-Allow-Credentials': 'true'})
         except User.DoesNotExist:
             return Response(
                 {"error": "User not found"}, 
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_404_NOT_FOUND,
+                headers={'Access-Control-Allow-Origin': 'https://localhost:3000',
+                        'Access-Control-Allow-Credentials': 'true'}
             )

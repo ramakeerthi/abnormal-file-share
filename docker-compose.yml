@@ -1,0 +1,44 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/static
+      - backend_media:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - FILE_ENCRYPTION_KEY=cGZ/wm8jB2S6Fw19UuawMEnU7Unpt40a93EwkldlmaE=
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - SECRET_KEY=cGZ/wm8jB2S6Fw19UuawMEnU7Unpt40a93EwkldlmaE=
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./backend:/backend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=https://localhost:8000
+      - HTTPS=true
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  backend_static:
+  backend_media:
+
+networks:
+  app-network:
+    driver: bridge 
