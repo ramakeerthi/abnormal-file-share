@@ -310,17 +310,17 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'filemanager': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
         },
